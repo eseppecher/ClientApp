@@ -1,0 +1,386 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->
+     
+  <script src="phonegap.js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+
+     var jstar = {
+                "id":  "",
+                "latitude": 0.0,
+                "longitude": 0.0,
+                "accuracy": 0.0,
+                "altitude": 0.0,
+                "runtime": 0.0
+                 };
+
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // device APIs are available -> deviceready
+    
+     var date = new Date();
+     var time = 0;
+     var iteration = 0;
+     var acc = 1000;
+     var accuracy = 1000;
+     var circles = [];
+     var list = [];
+    function onDeviceReady() {
+        alert('device ready' + Math.sqrt(2));
+    }
+    
+   function update(formm) {
+           accuracy =  4;
+           time = date.getTime();
+           navigator.geolocation.getCurrentPosition(gpsOptimisation, onError, {enableHighAccuracy: true});   
+          }
+
+   function gpsOptimisation(position) {
+   	iteration = iteration +1;
+   	list.push([iteration, position.coords.latitude, position.coords.longitude, position.coords.accuracy]);
+   	var element = document.getElementById('nbGPS');
+    element.innerHTML = iteration;
+    var element = document.getElementById('bestGPS');
+    element.innerHTML += position.coords.accuracy + ", ";
+   	var current_circle = new Array(); 
+   	current_circle = [position.coords.latitude, position.coords.longitude, position.coords.accuracy];
+   	add_circle(current_circle,circles);
+   	//alert(current_circle[0] + ' - '+ current_circle[1] + ' - '+ current_circle[2]);
+   	position_circle = best_circle(circles);
+   	   	//alert('Iteration n¡' + iteration + ' Accuracy = ' + acc + ' MyAccuracy = ' + position_circle[2]);
+
+   	acc = position.coords.accuracy; 
+
+   	if(acc<=accuracy){ 
+   		onSuccess(position); 
+   		}
+   	else{ 
+   		navigator.geolocation.getCurrentPosition(gpsOptimisation, onError, {enableHighAccuracy: true}); // When device ready send position request	
+   		
+   		}
+   	
+   }
+  
+    // Populate the database     
+    function populateDB(tx) {
+         var query = "INSERT INTO markers (id, latitude, longitude, accuracy, altitude, runtime) VALUES (' " +
+              jstar.id + " ', " + 
+              jstar.latitude + "," + 
+              jstar.longitude + "," + 
+              jstar.accuracy + "," + 
+              jstar.altitude + "," + 
+              jstar.runtime + ")";
+         tx.executeSql(query);
+    }
+
+    // Transaction error callback
+    function errorCB(tx, err) {
+        alert("Error processing SQL: "+err);
+    }
+
+    // Transaction success callback
+    function successCB() {
+
+        alert('success!!!!');
+    }
+
+
+    // onSuccess Geolocation
+    function onSuccess(position) {
+
+         date = new Date();
+        jstar.runtime = (date.getTime() - time) / 1000 ;
+        alert('Postion GPS obtenue!' + jstar.runtime + 's');
+
+         jstar.latitude = position.coords.latitude;
+         jstar.longitude = position.coords.longitude;
+         jstar.accuracy = position.coords.accuracy;
+         jstar.altitude = position.coords.altitude;
+         
+         alert('latitude : ' + jstar.latitude + ', longitude : ' +  jstar.longitude + ', accuracy : ' +  jstar.accuracy +', altitude : ' +  jstar.altitude +', runtime : ' +  jstar.runtime  );
+         
+    }
+
+    // onError Callback receives a PositionError object
+
+
+    function onError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
+    }
+
+
+
+     function record(newform) {
+
+           jstar.id =  document.newform.id.value;
+           
+          var db = window.openDatabase("GPSdata", "1.0", "GPS Database", 1000000);
+          alert('database open');
+          db.transaction(populateDB, errorCB, successCB);  
+          
+          alert(" Marker saved.");
+          
+
+          
+          }
+          
+//////////////////////////         
+          
+       function inside_circle(C,P){
+       	if((P[0]-C[0])*(P[0]-C[0])+(P[1]-C[1])*(P[1]-C[1])-C[2]*C[2]>0.01){ return(false);} else{return(true);}
+       }   
+          
+       function inside_intersect_circles(C,P){
+       	var n = C.length;
+       	for(var i=0;i<n;i++){ if(inside(C[i],P)===false){return(false);}}
+       	return(true);
+       } 
+       
+       function intersection(C,D){
+       	var x = D[0]-C[0];
+       	var y = D[1]-C[1];
+       	var d2 = x*x+y*y;
+       	var r = C[2];
+       	var s = D[2];
+       	
+       	var delta = -d2*d2-r*r*r*r-s*s*s*s+2*d2*r*r+2*d2*s*s+2*r*r*s*s;
+       	alert('x ' + x + ' y ' + y + ' r ' + r + ' s ' + s +  'delta = ' + delta);
+       	if(delta<=0){return([]);}
+       	else{
+       		var a = (d2 - s*s +r*r)/(2*d2);
+       		var b = Math.sqrt(delta)/(2*d2);
+       		return([[C[0]+a*x+b*y,C[1]+a*y-b*x],[C[0]+a*x-b*y,C[1]+a*y+b*x]]);
+   		}
+       }
+       function contains_points(C,P){
+       	var n = P.length;
+       	for(var i=0;i<n;i++){if(inside(C,P[i])===false){return(false);}}
+       	return(true);
+       } 
+       
+       function inscript_circle(P,Q,R){
+       	var a = P[0]-Q[0];
+       	var b = P[1]-Q[1];
+       	var c = Q[0]-R[0];
+       	var d = Q[1]-R[1];
+       	var e = (a*(P[0]+Q[0])+b*(P[1]+Q[1]))/2;
+       	var f = (a*(Q[0]+R[0])+b*(Q[1]+R[1]))/2;
+       	var det = a*d-b*c;
+       	if(det!=0){
+       	var x = (d*e-b*f)/det;
+       	var y = (a*f-c*e)/det;
+       	 }
+       	if(det===0){return([]);}else{return([x,y,getDistanceFromLatLon(x,y,P[0],P[1])]);}
+       }
+       
+       function smallest_circle(P){
+       
+       var n = P.length;
+       alert('smallest circle' + n);
+       var A=[0,0],B=[0,0],C=[0,0] ;
+       var CI = [0,0,0], CImin = [0,0,100000];
+       for(var i=2;i<n;i++){
+       	A = P[i];
+       	for(var j=1;j<i;j++){
+       		B = P[j];
+       		for(var k=0;k<j;k++){
+       			C = P[k];
+       			CI = inscript_circle(A,B,C);
+       			alert(CI[2] + ' - '+ CImin[2]);
+       			if((CI[2]<CImin[2])&&(contains_points(CI,P))){CImin = CI;}
+       		}
+       	}
+       }
+      	
+      	for(var i=1;i<n;i++){
+       	A = P[i];
+       	for(var j=0;j<i;j++){
+       		B = P[j];
+       		CI = [(A[0]+B[0])/2,(A[1]+B[1])/2,getDistanceFromLatLon(A[0],A[1],B[0],B[1])];
+       		if((CI[2]<CImin[2])&&(contains_points(CI,P))){CImin = CI;}
+       	}
+       	}
+       		
+       return(CImin);
+       }
+       
+       function best_circle(C){
+       	var n = C.length;
+       	var P = [];
+       	var internal_points = [];
+       	if(n<2){return(C[0]);}
+       	for(var i=1;i<n;i++){
+       		for(var j=0;j<i;j++){
+       			P = intersection(C[i],C[j]);
+       			//si P vide alors virer celui de plus grand rayon
+       			if(P.length === 2){
+       				if(inside_intersect_circles(C,P[0])){internal_points.push(P[0]);}
+       				if(inside_intersect_circles(C,P[1])){internal_points.push(P[1]);}
+   				}
+       		}
+       	}
+       	
+       	return(smallest_circle(internal_points));
+       }
+       
+       function add_circle(C,LC){
+       	var n = LC.length;
+       	var P = [];
+       	for(var i=0;i<n;i++){
+       		P = intersection(C,LC[i]);
+       		if(P.length === 0){
+       			if(C[2]<LC[i][2]){
+       				LC[i]=C;
+       				alert("ancienne donnŽe virŽe");
+       				return(LC);
+   				}
+   				else{
+   					alert("nouvelle donnŽe virŽe");
+   					return(LC);
+				}
+       		}
+       	}
+       	LC.push(C);
+       	alert("nouvelle donnŽe ajoutŽe");
+       	return(LC);
+       }
+       
+   ///////////////////////////    
+       
+ function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1);  // deg2rad below
+  var dLon = deg2rad(lon2-lon1); 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c; // Distance in km
+  return 1000*d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+      
+      
+      //////////////////////
+      
+      
+      
+    function mapSecteur() {
+          	
+        alert("center" + list[0][1] + "," + list[0][2] );
+    	var mapOptions = {
+               zoom: 16,
+               center: new google.maps.LatLng(list[0][1],list[0][2]),
+               mapTypeId: google.maps.MapTypeId.SATELLITE
+        };
+
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    infowindow = new google.maps.InfoWindow();
+    
+	for (var i = 0; i < list.length; i++){
+		
+    alert(i);
+    alert("point : " + list[i][0] + " , " + list[i][1] + "," + list[i][2] );
+    
+    
+    var circleOptions = {
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.35,
+      map: map,
+      center: new google.maps.LatLng(list[i][1],list[i][2]),
+      radius: list[i][3]
+    };
+    // Add the circle for this city to the map.
+    gpsCircle = new google.maps.Circle(circleOptions);
+    var marker = new google.maps.Marker({
+		position:  new google.maps.LatLng(list[i][1], list[i][2]),
+		map: map,
+		clickable: true,
+		title: "titre"
+    });
+    
+    marker.content = 'numero' + list[i][0];
+    
+    var infoWindow = new google.maps.InfoWindow();    
+    google.maps.event.addListener(marker, 'click', function () {
+                                infoWindow.setContent(this.content);
+                                infoWindow.open(this.getMap(), this);
+                            });
+    } //fin de for
+    
+    
+    
+    } 
+      
+      
+      
+      
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&sensor=false"></script>
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0 }
+  #map-canvas {
+    height: 60%;
+   }
+       
+ </style>
+
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+
+
+
+    <div class="container">
+
+   <button class="btn btn-default" onClick="update()"> Start </button>
+   <button class="btn btn-default" onClick="mapSecteur()"> Display </button> <br> <br>
+   
+   Nombre d'iteration : <div id="nbGPS"></div> 
+   
+   IterationList : <div id="bestGPS"></div>
+
+   PrecisionMaison : <div id="precision"></div>
+
+    
+   
+   
+    </div>
+  </div>     <!-- /container -->
+  
+  <div id="map-canvas" class="map-canvas"> </div> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->     
+
+    <script src="js/jquery.js"></script>
+    
+  </body>
+</html>

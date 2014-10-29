@@ -1,0 +1,125 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="cordova.js"></script>
+    <script src="js/xdb.js"></script>
+
+
+
+    <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bonoway.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+
+	<div id="navigation"> </div>
+
+    <div class="container">
+
+    <h4> Favoris </h4>
+
+
+    <ul class="list-group" id="listing" > </ul>
+
+
+    
+    </div>
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    <script src="js/navigation.js"></script>
+  
+    <script type="text/javascript" charset="utf-8">
+
+    // Wait for device API libraries to load
+    //
+    document.addEventListener("deviceready", onDeviceReady, false);
+    var slugish = "";
+    var secteurs;
+    var parkings;
+    var totalSecteurs = -1;
+    var totalParkings = -1;
+    var i = -1;
+    var p = -1;
+    var json = {
+        "SiteName":  "",
+        "SiteAbstract": "",
+        "SiteGPS": {
+            "Latitude": 0,
+            "Longitude": 0,
+            "Altitude": 0,
+            "Accuracy": 0
+            },
+        "Parking" : [],
+        "Secteur" : []
+          };
+
+          
+    function onDeviceReady() {
+        // When device ready open,create database
+               
+        var query = "SELECT * FROM sites"; 
+        var db = window.openDatabase("bonowayDB", "1.0", "Bonoway Local Database", 1000000);
+          
+        db.transaction(function (tx){ tx.executeSql( query, [], dispFavori, onError )});
+        
+    }
+
+
+    function dispFavori(tx, results){
+         var len = results.rows.length;
+         var chain= "";
+         var superchain= "";
+         var element = document.getElementById('listing');
+         for (i = 0; i < len; i++){
+         	chain = 'filter("' + results.rows.item(i).slug + '", "display")';
+         	chain2 = 'filter("' + results.rows.item(i).slug + '", "edit")';
+         	chain3 = 'filter("' + results.rows.item(i).slug + '", "send")'; 
+         	chain4 = 'deleteSite("' + results.rows.item(i).slug + '")';
+            superchain = "<li class='list-group-item'> <a onclick='" + chain +"'> " + myDecode(results.rows.item(i).name) + "<span class='badge justified badge-route'>" + results.rows.item(i).linenb + "</span> </a>"  +
+             "<element class='fonctions'> <button type='button' class='btn btn-default btn-rs' onclick='" + chain2 + "'> <span class='glyphicon glyphicon-pencil'  ></span></button> " +
+             "<button type='button' class='btn btn-default btn-rs' onclick='" + chain3 + "'> <span class='glyphicon glyphicon-send'></span></button> " +
+             "<button type='button' class='btn btn-default btn-rs' onclick='" + chain4 + "' > <span class='glyphicon glyphicon-remove'></span></button></element></li>";           
+            element.innerHTML += superchain;
+         }
+    }
+
+
+    // Transaction error callback
+    function onError(tx, err) { alert("Error processing SQL: "+err);}
+    
+    function onSuccess(x) {
+        if(x==3){
+        	alert("Le site a été retiré des favoris");
+            window.location.href="favoris.html";
+        }
+        else{
+        	alert("success!");
+        }
+    }
+
+    function finish(){ // callback from deleting a site
+    	window.location.href = "favoris.html";
+    }
+    
+    </script>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    
+    
+  </body>
+</html>

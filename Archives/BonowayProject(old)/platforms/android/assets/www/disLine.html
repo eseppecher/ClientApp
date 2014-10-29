@@ -1,0 +1,141 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="cordova.js"></script>
+  
+    
+   <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+      body {
+        color: #4E5053;  
+      }
+      
+      html, body, #map-canvas {
+        width: 95%;
+        height: 95%;
+      }
+      
+      .navbar navbar-inverse navbar-fixed-top{ }
+</style>
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+ 
+</head> 
+<body> 
+
+	<div id="navigation"> </div>
+
+
+    <div class="container" id="content">
+
+    <h4>Loading data... </h4>
+    
+    </div>
+      
+    <div id="map-canvas"></div>
+    
+    
+    
+    <!-- ========================= JAVASCRIPT ========================= -->    
+              
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&sensor=false"></script>   
+
+    <script type="text/javascript" charset="utf-8">
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {           
+                   
+         // recuperation du slugline  
+         
+         slugline = "";
+         var requete = window.location.search ; 
+         if (requete) {
+             requete = requete.substring(1) ; 
+             requete = unescape(requete) ; 
+             eval(requete); } 
+    
+    
+     var ajaxRequest = new XMLHttpRequest();
+     	ajaxRequest.onreadystatechange = function () {
+     		if(ajaxRequest.readyState==4 && ajaxRequest.status==200){
+     			var jsonR = JSON.parse(ajaxRequest.responseText); 
+     			var arboElement = document.getElementById('arbo');
+     			arboElement.innerHTML = '<a href="receiveSites.html"> /AllSites/ </a>' + jsonR.site + '/' + jsonR.name ;
+     			var element = document.getElementById('content');
+     			element.innerHTML = '<h4>' + jsonR[0].name + ', ' +
+     			jsonR[0].grade + ', ' +
+     			jsonR[0].site + '</h4>';
+                showMap(jsonR);
+     		}
+     	}	
+    
+    var queryString = "http://damp-temple-1064.herokuapp.com/api/line/?format=json&slug=" + slugline ;
+    ajaxRequest.open("GET", queryString, false, "etienne", "makalu" );
+    ajaxRequest.send(null);   
+    
+
+     
+     
+     
+           
+    } //fin de onDeviceReady
+      
+    function showMap(jsonR) {
+    	var mapOptions = {
+               zoom: 17,
+               center: new google.maps.LatLng(jsonR.latitude,jsonR.longitude),
+               mapTypeId: google.maps.MapTypeId.SATELLITE
+        };
+
+     var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+
+     var contentString = '<div id="content">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h4 id="firstHeading" class="firstHeading">' + jsonR.name +
+      ', ' + jsonR.grade +
+      '</h4> <div id="bodyContent">'+
+      '<p>' + jsonR.site +  
+      '</p> </div>'+
+      '</div>';
+    		
+	var infowindow = new google.maps.InfoWindow({
+        content: contentString
+	  });
+
+    
+    var marker = new google.maps.Marker({
+		position:  new google.maps.LatLng(jsonR.latitude, jsonR.longitude),
+		map: map,
+        title: "test"
+    });
+        
+    google.maps.event.addListener(marker, 'click', function() {
+           infowindow.open(map,marker);
+    });
+    
+    }
+
+    </script>
+   
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    <script src="js/navigation.js"></script>
+    
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+</head> 
+<body> 
+
+    <!-- Le styles -->
+    <script src="../cordova.js"></script>
+    <script src="../cordova_plugins.js"></script>
+    <script src="../js/bootstrap-collapse.js"></script>
+    
+     
+    <link href="../css/bootstrap.css" rel="stylesheet">
+
+
+   
+
+    
+     
+    <script type="text/javascript" charset="utf-8">
+
+    var pictureSource;   // picture source
+    var destinationType; // sets the format of returned value
+
+    // Wait for device API libraries to load
+    //
+    document.addEventListener("deviceready",onDeviceReady,false);
+
+    // device APIs are available
+    //
+    function onDeviceReady() {
+    	alert("device ready");
+     navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+    destinationType: Camera.DestinationType.DATA_URL
+});
+ }
+function onSuccess(imageData) {
+    var image = document.getElementById('myImage');
+    image.src = "data:image/jpeg;base64," + imageData;
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
+
+    </script>
+ 
+    <!-- ========================= HTML ========================= -->
+ 
+      <div class="container">
+  
+    <button onclick="capturePhoto();">Capture Photo</button> <br>
+    <button onclick="capturePhotoEdit();">Capture Editable Photo</button> <br>
+    <button onclick="getPhoto(pictureSource.PHOTOLIBRARY);">From Photo Library</button><br>
+    <button onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);">From Photo Album</button><br>
+    <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
+    <img style="display:none;" id="largeImage" src="" />
+
+    </div>
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+
+
+
+  </body>
+</html>

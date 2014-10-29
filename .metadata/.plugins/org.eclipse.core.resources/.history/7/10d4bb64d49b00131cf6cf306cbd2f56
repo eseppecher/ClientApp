@@ -1,0 +1,159 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->
+     
+  <script src="phonegap.js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+
+     var jstar = {
+                "id":  "",
+                "latitude": 0.0,
+                "longitude": 0.0,
+                "accuracy": 0.0,
+                "altitude": 0.0,
+                "runtime": 0.0
+                 };
+
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // device APIs are available -> deviceready
+    
+     var d = new Date();
+     var n = 0;
+   
+    function onDeviceReady() {
+        n = d.getTime()
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, {enableHighAccuracy: true}); // When device ready send position request
+    }
+
+   function gpsOptimisation() {
+   	
+   }
+  
+    // Populate the database     
+    function populateDB(tx) {
+         var query = "INSERT INTO markers (id, latitude, longitude, accuracy, altitude, runtime) VALUES (' " +
+              jstar.id + " ', " + 
+              jstar.latitude + "," + 
+              jstar.longitude + "," + 
+              jstar.accuracy + "," + 
+              jstar.altitude + "," + 
+              jstar.runtime + ")";
+         tx.executeSql(query);
+    }
+
+    // Transaction error callback
+    function errorCB(tx, err) {
+        alert("Error processing SQL: "+err);
+    }
+
+    // Transaction success callback
+    function successCB() {
+
+        alert('success!!!!');
+    }
+
+
+    // onSuccess Geolocation
+    function onSuccess(position) {
+        jstar.runtime = d.getTime() - n ;
+        alert('Postion GPS obtenue!' + jstar.runtime + 's');
+
+         jstar.latitude = position.coords.latitude;
+         jstar.longitude = position.coords.longitude;
+         jstar.accuracy = position.coords.accuracy;
+         jstar.altitude = position.coords.altitude;
+         
+         alert('latitude : ' + jstar.latitude + ', longitude : ' +  jstar.longitude + ', accuracy : ' +  jstar.accuracy +', altitude : ' +  jstar.altitude +', runtime : ' +  jstar.runtime  );
+         
+         var element = document.getElementById('submeat');
+         element.innerHTML = "<button type='submit' id='submeat'class='btn btn-success' onClick='record()'> Add. </button>";
+    }
+
+    // onError Callback receives a PositionError object
+
+
+    function onError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
+    }
+
+
+
+     function record(newform) {
+
+           jstar.id =  document.newform.id.value;
+           
+          var db = window.openDatabase("GPSdata", "1.0", "GPS Database", 1000000);
+          alert('database open');
+          db.transaction(populateDB, errorCB, successCB);  
+          
+          alert(" Marker saved.");
+          
+
+          
+          }
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+   
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        color: #4E5053;    
+      }
+       
+     .navbar navbar-inverse navbar-fixed-top{ }
+ </style>
+ <link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+
+
+
+    <div class="container">
+
+      <h1>Ajouter un marker </h1>
+
+    <form role="form" name="newform">  
+      
+    
+
+   
+    </div> <br>
+    
+    <b>id</b>
+    <div class="form-group">  <input type="text" name="id" placeholder="identifier le marker"> </div> <br>
+      
+      
+     <div id="submeat"> 
+      <button type="submit" id="submeat" class="btn btn-danger" onClick="record()"> En attente du GPS </button>
+    </div>
+   </form>
+ 
+  </div>     <!-- /container -->
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->     
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    
+  </body>
+</html>

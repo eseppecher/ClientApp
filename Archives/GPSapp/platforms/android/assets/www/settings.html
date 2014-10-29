@@ -1,0 +1,100 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="phonegap.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+    
+  
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() { 
+       var element = document.getElementById('boutons');
+       element.innerHTML = '<button type="button" class="btn btn-danger" onClick="reset(createMarkers)" > (re)Create marker table. </button> <br> <br>' ;
+       alert("Device is ready");
+    }   
+
+  
+  // Populate the database     
+
+    function createMarkers(tx) {
+         tx.executeSql('DROP TABLE IF EXISTS markers');        
+         tx.executeSql('CREATE TABLE IF NOT EXISTS markers (id varchar(255), latitude, longitude, accuracy, altitude, runtime)');
+         alert("new markers table" );
+    }
+    
+
+    
+
+    // Transaction error callback
+    function onError(tx, err) {
+        alert("Error processing SQL: "+err);
+    }
+
+    // Transaction success callback
+    function onSuccess() {
+        alert("success!");
+    }   
+          
+     
+     function reset(x) {         
+          var db = window.openDatabase("GPSdata", "1.0", "GPS Database", 1000000);
+          db.transaction(x, onError, onSuccess);  
+          }      
+          
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+    body {
+        color: #4E5053;   
+    }
+      
+    .navbar navbar-inverse navbar-fixed-top{ }
+</style>
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+	<div id="navigation"> </div>
+
+
+    <div class="container">
+
+    <p>Gestion des tables.</p>
+     
+   <div id="boutons">  
+   
+   
+   <button type="button" id="erasem"class="btn btn-danger" disabled> (re)Create marker table. </button>
+   <br> <br>
+
+ 
+  </div>
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+	<script src="js/navigation.js"></script>
+	
+  </body>
+</html>

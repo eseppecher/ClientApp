@@ -1,0 +1,341 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="cordova.js"></script>
+  
+    
+   <!-- ========================= STYLE ========================= -->
+<link href="flot/examples/myExamples.css" rel="stylesheet" type="text/css">
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bonoway.css" rel="stylesheet">
+<style>
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0 }
+  #map-canvas {
+    height: 85.6%;
+    background-color: transparent;
+
+   }
+   
+    #switch {
+    z-index: 5;
+    text-align: right;
+    margin-right: 10px;
+    margin-top: 20px;
+    margin-bottom: -56px;
+   }
+   
+   .breadcrumb{
+   margin-top: -20px;
+   
+   }
+   .btn{
+   	z-index: 5;
+   }
+   
+   .container{
+   margin-top: -10px;
+   margin-bottom: -10px;
+   }
+   
+   .nav-tabs{
+   margin-top: -20px;
+   margin-bottom: -20px;
+   }
+      
+</style>
+
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+	
+<div id="navigation"> </div>
+
+
+<ol class="breadcrumb" id="headsection">
+</ol>
+
+
+
+<div id="container" class="container"> </div>
+
+
+<div id="map-canvas" class="map-canvas"> </div>    
+
+
+    
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+          
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&sensor=false"></script>
+    <script src="js/navigation.js"></script>
+    <script language="javascript" type="text/javascript" src="flot/jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="flot/jquery.flot.js"></script>
+	<script language="javascript" type="text/javascript" src="flot/jquery.flot.categories.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+    var currentSecteur = -1;
+    var currentLine = -1;
+    
+    function onDeviceReady() {
+                    
+         var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);          
+           
+         json = "";
+         var requete = window.location.search ; 
+         if (requete) {
+             requete = requete.substring(1) ; 
+             requete = unescape(requete) ; 
+             eval(requete); } 
+        json = JSON.parse(json);
+
+        display(1);
+    }
+    
+    function display(step) {
+      	if(step==1){
+      	    document.getElementById("map-canvas").innerHTML = " ";
+      		var element = document.getElementById('headsection');
+        	element.innerHTML = '<li><a href="favoris.html"> Fav. </a></li> <li class="active">' + myDecode(json.SiteName) + '</li>';
+      		
+      		var elt = document.getElementById('container');
+      		elt.innerHTML = '<div id="switch">' +
+      		'<div class="btn-group"> <button type="button" class="btn btn-default active" onclick="display(1)"><span class="glyphicon glyphicon-th-list"></span></button>' + 
+      		'<button type="button" class="btn btn-default" onclick="display(1.5)"><span class="glyphicon glyphicon-map-marker"></span></button> </div>'+
+      		'</div>';
+        	elt.innerHTML += myDecode(json.SiteAbstract);
+
+        	elt.innerHTML += '<div class="demo-container"> <div id="placeholder" class="demo-placeholder"></div></div>';
+        	histoplot(json.histo);
+        	elt.innerHTML +='<h5> Secteurs : </h5> <ul class="list-group">';
+ 
+         	for(k=0;k<json.Secteur.length;k++){
+         		 elt.innerHTML +=  '<li class="list-group-item" onclick="selectIt(' + k + ')">' + myDecode(json.Secteur[k].name) + "<span class='badge badge-route'>" + json.Secteur[k].linenb + "</span>" +'</li>';
+      		}
+
+      	}
+      	
+      	if(step==1.5){
+      		document.getElementById("map-canvas").innerHTML = " ";
+      		var element = document.getElementById('headsection');
+        	element.innerHTML = '<li><a href="favoris.html"> Fav. </a></li> <li class="active">' + myDecode(json.SiteName) + '</li>';
+      		
+      		var elt = document.getElementById('container');
+      		elt.innerHTML = '<div id="switch">' +
+      		'<div class="btn-group"> <button type="button" class="btn btn-default" onclick="display(1)"><span class="glyphicon glyphicon-th-list"></span></button>' + 
+      		'<button type="button" class="btn btn-default active" onclick="display(1.5)"><span class="glyphicon glyphicon-map-marker"></span></button> </div>'+
+      		'</div>';
+
+      		mapSite();
+      	}
+      	
+      	
+      	if(step==2){
+      		document.getElementById('map-canvas').innerHTML ="";
+      		var element = document.getElementById('headsection');
+        	element.innerHTML = '<li><a href="favoris.html"> Fav. </a></li> <li onclick="display(1)">' + 
+        	myDecode(json.SiteName) + '</li> <li class="active">' + myDecode(json.Secteur[currentSecteur].name) +'</li>';      	
+      		
+      		var elt = document.getElementById('container');
+      		elt.innerHTML = '<div id="switch">' +
+      		'<div class="btn-group"> <button type="button" class="btn btn-default active" onclick="display(2)"><span class="glyphicon glyphicon-th-list"></span></button>' + 
+      		'<button type="button" class="btn btn-default" onclick="display(3)"><span class="glyphicon glyphicon-map-marker"></span></button> </div>'+
+      		'</div>';
+      		elt.innerHTML +=myDecode(json.Secteur[currentSecteur].histo);
+        	elt.innerHTML +='<ul class="list-group">';
+
+         	for(k=0;k<json.Secteur[currentSecteur].Voie.length;k++){
+         		var chain = "selectLine(" + k + ")";
+         		   elt.innerHTML +=  '<li class="list-group-item"><a onclick="' + chain + '">' + myDecode(json.Secteur[currentSecteur].Voie[k].name) + 
+         		   ' ' + fgradeDecode(json.Secteur[currentSecteur].Voie[k].grade) + ' ' + rateDecode(json.Secteur[currentSecteur].Voie[k].rate) + '</a></li>';
+      		}
+      		elt.innerHTML += '</ul>';
+      	}	 
+      	
+      	if(step==3){
+      		var element = document.getElementById('headsection');
+        	element.innerHTML = '<li><a href="favoris.html"> Fav. </a></li> <li onclick="display(1)">' + 
+        	myDecode(json.SiteName) + '</li> <li class="active">' + myDecode(json.Secteur[currentSecteur].name) +'</li>';      	
+      		
+			var elt = document.getElementById('container');
+      		elt.innerHTML = '<div id="switch">' +
+      			'<div class="btn-group"> <button type="button" class="btn btn-default" onclick="display(2)"><span class="glyphicon glyphicon-th-list"></span></button>' + 
+      			'<button type="button" class="btn btn-default active" onclick="display(3)"><span class="glyphicon glyphicon-map-marker"></span></button> </div>'+
+      			'</div>';
+  
+        	mapSecteur();
+
+      	} 	
+      	if(step==4){
+      		var element = document.getElementById('headsection');
+        	element.innerHTML = '<li><a href="favoris.html"> Fav. </a></li> <li onclick="display(1)">' + 
+        	myDecode(json.SiteName) + '</li> <li onclick="display(2)">' + myDecode(json.Secteur[currentSecteur].name) +'</li>' + 
+        	'<li class="active">'+ myDecode(json.Secteur[currentSecteur].Voie[currentLine].name) +'</li>' ;
+        	
+        	var element = document.getElementById('container');
+        	element.innerHTML ='<h4>' + myDecode(json.Secteur[currentSecteur].Voie[currentLine].name) + 
+         		   ' ' + fgradeDecode(json.Secteur[currentSecteur].Voie[currentLine].grade) + ' ' + rateDecode(json.Secteur[currentSecteur].Voie[currentLine].rate) +
+         		    '</h4> <p><i>' + myDecode(json.Secteur[currentSecteur].Voie[currentLine].abstract) + '</i></p>';
+        	     
+      	}
+    }
+    
+
+
+	function histoplot(data) {
+
+		alert("histoplot launched");
+		alert(data[0][0]);
+		data = [ ["3", 0], ["4", 5], ["5", 10], ["6", 8], ["7", 2], ["8", 0], ["9", 0] ];
+
+		$.plot("#placeholder", [ data ], {
+			series: {
+				bars: {
+					show: true,
+					barWidth: 1,
+					align: "center"
+				}
+			},
+			xaxis: {
+				show: true,
+				mode: "categories",
+				tickLength: 0
+			},
+			yaxis: {
+				show: false,
+			}
+		});
+	};
+
+  
+  
+      function mapSite() {
+    	var mapOptions = {
+               zoom: 16,
+               center: new google.maps.LatLng(json.SiteGPS.Latitude,json.SiteGPS.Longitude),
+               mapTypeId: google.maps.MapTypeId.SATELLITE
+        };
+
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    infowindow = new google.maps.InfoWindow();
+   var image = {
+    url: 'img/parkicon.png',
+    // This marker is 20 pixels wide by 32 pixels tall.
+    size: new google.maps.Size(60, 100),
+    // The origin for this image is 0,0.
+    //origin: new google.maps.Point(0,-10),
+    // The anchor for this image is the base of the flagpole at 0,32.
+    anchor: new google.maps.Point(20, 50)
+  };
+
+// DISPLAY PARKINGS
+	for (var i = 0; i < json.Parking.length; i++){
+   
+	    var marker = new google.maps.Marker({
+			position:  new google.maps.LatLng(json.Parking[i].latitude, json.Parking[i].longitude),
+			map: map,
+			clickable: true,
+			icon: image,
+	        title: "Parking"
+	    });
+    
+	    marker.content = "Parking " + json.Parking[i].id;
+	    
+	    var infoWindow = new google.maps.InfoWindow();    
+		google.maps.event.addListener(marker, 'click', function () {
+	                                infoWindow.setContent(this.content);
+	                                infoWindow.open(this.getMap(), this);
+	    });
+    } 
+    
+// DISPLAY SECTEURS
+    
+	for (var j = 0; j < json.Secteur.length; j++){
+   
+	    var marker = new google.maps.Marker({
+			position:  new google.maps.LatLng(json.Secteur[j].latitude, json.Secteur[j].longitude),
+			map: map,
+			clickable: true,
+	        title: myDecode(json.Secteur[j].name)
+	    });
+    
+	    marker.content = '<a onclick="selectIt(' + j + ')"> Secteur ' + myDecode(json.Secteur[j].name) + '</a>';
+	    
+	    var infoWindow = new google.maps.InfoWindow();    
+		google.maps.event.addListener(marker, 'click', function () {
+	                                infoWindow.setContent(this.content);
+	                                infoWindow.open(this.getMap(), this);
+	    });
+    } //fin de for    
+    
+    
+    } 
+  
+  
+    
+    function mapSecteur() {
+    	var mapOptions = {
+               zoom: 22,
+               center: new google.maps.LatLng(json.Secteur[currentSecteur].latitude,json.Secteur[currentSecteur].longitude),
+               mapTypeId: google.maps.MapTypeId.SATELLITE
+        };
+
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    infowindow = new google.maps.InfoWindow();
+    
+	for (var i = 0; i < json.Secteur[currentSecteur].Voie.length; i++){
+ 
+
+    var marker = new google.maps.Marker({
+		position:  new google.maps.LatLng(json.Secteur[currentSecteur].Voie[i].latitude, json.Secteur[currentSecteur].Voie[i].longitude),
+		map: map,
+		clickable: true,
+        title: json.Secteur[currentSecteur].Voie[i].name
+    });
+    
+    marker.content = myDecode(json.Secteur[currentSecteur].Voie[i].name) + " " + fgradeDecode(json.Secteur[currentSecteur].Voie[i].grade) + " " + rateDecode(json.Secteur[currentSecteur].Voie[i].rate) +
+     "<br> Accuracy: " + json.Secteur[currentSecteur].Voie[i].accuracy;
+    
+    var infoWindow = new google.maps.InfoWindow();    
+google.maps.event.addListener(marker, 'click', function () {
+                                infoWindow.setContent(this.content);
+                                infoWindow.open(this.getMap(), this);
+                            });
+    } 
+    
+    } 
+    
+    function selectIt(k) {
+      currentSecteur = k;
+      display(2);
+          }
+          
+     function selectLine(x) {
+      currentLine = x;
+      alert(" - " + currentLine);
+      display(4);
+          }
+             
+    </script>
+    
+    
+   
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    <script src="js/xdb.js"></script>
+  
+  </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+   <!-- ========================= STYLE ========================= -->
+
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        color: #4E5053;   
+      }
+      
+.navbar navbar-inverse navbar-fixed-top{
+ 
+}
+    </style>
+    <link href="../css/bootstrap-responsive.css" rel="stylesheet">
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="index.html">Bonoway Mango </a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="addLine.html"> <i class="icon-plus icon-white"></i> Ajouter une ligne </a></li>
+              <li><a href="addCrag.html"> <i class="icon-plus icon-white"></i> Ajouter un site </a></li>
+              <li><a href="listLines.html"> <i class="icon-th-list icon-white"> </i> Voies </a></li>
+              <li><a href="listCrags.html"> <i class="icon-th-list icon-white"> </i> Sites </a></li>
+              <li><a href="mapLines.html"> <i class="icon-map-marker icon-white"> </i> Carte des voies </a></li>
+              <li><a href="mapCrags.html"> <i class="icon-map-marker icon-white"> </i> Carte des sites </a></li>
+              <li><a href="settings.html"> <i class="icon-wrench icon-white"> </i> Réglages </a></li>              
+              <li><a href="dev/testarea.html"> - Developpement- </a></li>
+            </ul>
+          </div> 
+        </div>
+      </div>
+    </div>
+    <div class="container">
+
+      <h4>Bienvenue dans la zone de test </h4>
+      
+   <button type="button" class="btn btn-default" onClick="window.location.href = 'plot.html';" >  Canvas "plot.html"  </button>
+   <br> <br>
+   <button type="button" class="btn btn-default" onClick="window.location.href = 'geo.html';" >  Geolocalisation "geo.html"  </button>
+   <br> <br>
+   <button type="button" class="btn btn-default" onClick="window.location.href = 'gmap.html';" >  Gmap test "gmap.html"  </button>
+   <br> <br>
+   <button type="button" class="btn btn-default" onClick="window.location.href = 'gmap2.html';" >  Gmap test 2 "gmap2.html"  </button>
+   <br> <br>
+   <button type="button" class="btn btn-default" onClick="window.location.href = 'camera.html';" >  Appareil photo "camera.html"  </button>
+   <br> <br>
+   <button type="button" class="btn btn-default" onClick="window.location.href = 'log.html';" >  Ouverture de session "log.html"  </button>
+   <br> <br>
+   <button type="button" class="btn btn-default" onClick="window.location.href = 'watchme.html';" >  Suivi de position "watchme.html"  </button>
+ 
+      
+    </div>
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+        
+    <script type="text/javascript" src="../cordova.js"></script>  
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap-collapse.js"></script>
+
+  </body>
+</html>

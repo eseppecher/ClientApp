@@ -1,0 +1,169 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+  </head>
+  <body>  
+  
+   <!-- ========================= JAVASCRIPT ========================= -->    
+
+    <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>
+    
+    <script type="text/javascript" charset="utf-8">
+    
+    
+    document.addEventListener("deviceready", onDeviceReady, false); // Wait for Cordova to load
+
+    var watchID = null;
+
+    // Cordova is ready
+    //
+    function onDeviceReady() {
+        // Throw an error if no update is received every 30 seconds
+        var options = { timeout: 30000 };
+        watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
+    }
+
+    // onSuccess Geolocation
+    //
+    function onSuccess(position) {
+        var element = document.getElementById('geolocation');
+        element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
+                            'Longitude: ' + position.coords.longitude     + '<br />' +
+                            '<hr />'      + element.innerHTML;
+    }
+
+    // onError Callback receives a PositionError object
+    //
+    function onError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
+    }
+
+    </script>
+
+  
+  <!-- ========================= STYLE ========================= -->
+
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        color: #4E5053;   
+      }
+      
+.navbar navbar-inverse navbar-fixed-top{
+ 
+}
+    </style>
+    <link href="../css/bootstrap-responsive.css" rel="stylesheet">
+ 
+
+      <!-- ========================= HTML ========================= -->  
+    
+
+  
+      <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="index.html">Bonoway Mango </a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="addLine.html"> <i class="icon-plus icon-white"></i> Ajouter une ligne </a></li>
+              <li><a href="addCrag.html"> <i class="icon-plus icon-white"></i> Ajouter un site </a></li>
+              <li><a href="listLines.html"> <i class="icon-th-list icon-white"> </i> Voies </a></li>
+              <li><a href="listCrags.html"> <i class="icon-th-list icon-white"> </i> Sites </a></li>
+              <li><a href="mapLines.html"> <i class="icon-map-marker icon-white"> </i> Carte des voies </a></li>
+              <li><a href="mapCrags.html"> <i class="icon-map-marker icon-white"> </i> Carte des sites </a></li>
+              <li><a href="settings.html"> <i class="icon-wrench icon-white"> </i> Réglages </a></li>              
+              <li><a href="dev/testarea.html"> - Developpement- </a></li>
+            </ul>
+          </div> 
+        </div>
+      </div>
+    </div>
+  
+  
+    <div class="container">
+    
+    <p id="geolocation">Watching geolocation...</p>
+
+    </div>
+    
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script type="text/javascript" src="../phonegap.js"></script>  
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap-collapse.js"></script>
+
+
+
+
+
+// Note: This example requires that you consent to location sharing when
+// prompted by your browser. If you see a blank space instead of the map, this
+// is probably because you have denied permission for location sharing.
+
+var map;
+
+function initialize() {
+  var mapOptions = {
+    zoom: 6
+  };
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+  // Try HTML5 geolocation
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = new google.maps.LatLng(position.coords.latitude,
+                                       position.coords.longitude);
+
+      var infowindow = new google.maps.InfoWindow({
+        map: map,
+        position: pos,
+        content: 'Location found using HTML5.'
+      });
+
+      map.setCenter(pos);
+    }, function() {
+      handleNoGeolocation(true);
+    });
+  } else {
+    // Browser doesn't support Geolocation
+    handleNoGeolocation(false);
+  }
+}
+
+function handleNoGeolocation(errorFlag) {
+  if (errorFlag) {
+    var content = 'Error: The Geolocation service failed.';
+  } else {
+    var content = 'Error: Your browser doesn\'t support geolocation.';
+  }
+
+  var options = {
+    map: map,
+    position: new google.maps.LatLng(60, 105),
+    content: content
+  };
+
+  var infowindow = new google.maps.InfoWindow(options);
+  map.setCenter(options.position);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+
+
+
+  </body>
+</html>

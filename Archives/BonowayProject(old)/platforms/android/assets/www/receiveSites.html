@@ -1,0 +1,198 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="cordova.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    var jsonR = "";
+  
+    
+   
+    function onDeviceReady() {
+           
+       var ajaxRequest = new XMLHttpRequest();          
+       ajaxRequest.onreadystatechange = function () {
+           if(ajaxRequest.readyState==4 && ajaxRequest.status==200){
+           	alert("Connexion succeded");
+
+                     jsonR = JSON.parse(ajaxRequest.responseText); //Traduction de la réponse en JSON
+                     var element = document.getElementById('content');
+                     element.innerHTML = ' <h4>Liste des sites  </h4> <table class="table table-hover" id="listing">' + 
+                     '<tr><td> Nom </td> <td> Description  </td> <td> Favoris </td> </tr> </table>';
+                     
+                     element = document.getElementById('listing');
+                     
+                     for (i = 0; i < jsonR.length; i++){
+                          chain = "filter('" + i + "')";
+                          superchain = "favoris('" + jsonR[i].slug + "')";
+                          megachain = '<tr>  <td onclick="' + chain + '">' + 
+                          jsonR[i].name + 
+                          '</td> <td onclick="' + chain+ '">' + jsonR[i].name + 
+                          '</td> <td> <span class="glyphicon glyphicon-star" onclick="' + chain + '"> </span>' + 
+                          '</td></tr>' ;
+                          element.innerHTML += megachain;
+                     };                   
+             }
+     }	
+           
+          
+     var queryString = "http://sleepy-shore-2585.herokuapp.com/api/site";
+     ajaxRequest.open("GET", queryString, false);
+     ajaxRequest.send(null);
+        
+    }
+    
+    var jsonSite;
+    var jsonLines;
+        
+function favoris(slug) {
+
+    //Request for site object 
+	 var ajaxSite = new XMLHttpRequest();
+	 ajaxSite.onreadystatechange = function(){
+	  	 if(ajaxSite.readyState==4 && ajaxSite.status==200){
+			jsonSite = JSON.parse(ajaxSite.responseText); 
+			var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);
+            alert('database open');       
+            db.transaction(fillFavoriS, errorCB, successCB);  
+		}	
+	}
+	
+	     var queryString = "http://damp-temple-1064.herokuapp.com/api/site/" + slug  ;
+     alert(queryString);
+     ajaxSite.open("GET", queryString, false );
+     ajaxSite.setRequestHeader("Content-Type","application/json");
+     ajaxSite.send(null);
+ 
+     
+      //Request for site objects
+      
+  
+	var ajaxLines = new XMLHttpRequest();
+	ajaxLines.onreadystatechange = function(){
+		if(ajaxLines.readyState==4 && ajaxLines.status==200){
+			jsonLines = JSON.parse(ajaxLines.responseText); 
+			alert(jsonLines[0].name);
+			var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);
+            alert('database open');       
+            db.transaction(fillFavoriL, errorCB, successCB);  
+		}	
+	}
+                       
+     var queryString = "http://damp-temple-1064.herokuapp.com/api/line/site__slug=" + slug  ;
+     alert(queryString);
+     ajaxLines.open("GET", queryString, false );
+     ajaxLines.setRequestHeader("Content-Type","application/json");
+     ajaxLines.send(null);                 
+        
+
+    }
+
+    function fillFavoriS(tx) {
+         //save the site attributes
+         var query1 = "INSERT INTO sites (name, abstract, country, state, county, city, latitude, longitude, altitude, accuracy, slug) VALUES (' " +
+              jsonSite.name + " ',' " + 
+              jsonSite.abstract + " ','" + 
+              jsonSite.country + "','" + 
+              jsonSite.state + "','" + 
+              jsonSite.county + "','" + 
+              jsonSite.city + "'," + 
+              jsonSite.latitude + "," + 
+              jsonSite.longitude + "," + 
+              jsonSite.altitude + "," + 
+              jsonSite.accuracy + ",'" +
+              jsonSite.slug + "')";    
+         tx.executeSql(query1);
+         alert("site enregistre");
+    }
+    
+     function fillFavoriL(tx) {     
+         //save all the site's routes.
+         alert("line process started");
+         alert(jsonLines.length);
+         for (i = 0; i < jsonLines.length; i++){  
+         	var query = "INSERT INTO lines (name, abstract,  site) VALUES ('" + 
+         	jsonLines[i].name + "', '" +
+         	jsonLines[i].abstract + "', '" +
+         	jsonSite.slug + "')";
+          	alert(query);      
+          	tx.executeSql(query);
+          	alert("line enregistre"); 
+      	}
+    }
+    
+    
+        // Transaction error callback
+    function errorCB(tx, err) {
+        alert("Error processing SQL: "+err);
+    }
+
+    // Transaction success callback
+    function successCB() {
+        alert('success!!!!');
+    }
+    
+    function filter(x) {	
+		var jSite = JSON.stringify(jsonR[x]);
+        var requete= "jSite='" + jSite + "';" ;  
+        requete = escape(requete);
+        window.location.href = "disSite.html?" + requete ;  
+    }
+     
+    </script>
+
+
+
+    <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+      body {
+        color: #4E5053;     
+        
+      }
+      
+      .navbar navbar-inverse navbar-fixed-top{ }
+</style>
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+	<div id="navigation"> </div>
+
+
+
+    <div class="container" id="content">
+
+
+    <h4> Loading data... </h4>
+
+
+    
+    
+  </div>
+ 
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+	<script src="js/navigation.js"></script>
+
+  </body>
+</html>

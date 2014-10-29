@@ -1,0 +1,197 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->
+     
+  <script src="cordova.js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+
+     var jstar = {
+                "name":  "",
+                "grade": "",
+                "site": "",
+                "abstract": "",
+                "latitude": 0,
+                "longitude": 0,
+                "altitude": 0,
+                "accuracy": 0
+                 };
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() { 
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, {enableHighAccuracy: true});
+        getGrades();
+        getSites(); 
+    }
+    
+    function getGrades(){
+    	
+    	var ajaxQuery = new XMLHttpRequest();
+    	ajaxQuery.onreadystatechange = function () {
+    		if(ajaxQuery.readyState==4 && ajaxQuery.status==200){
+    			var jsonR = JSON.parse(ajaxQuery.responseText); //Traduction de la réponse en JSON
+                element = document.getElementById('gradelist');                     
+                for (i = 0; i < jsonR.length; i++){
+                	chain = "<option value=" + jsonR[i].name + "> " + jsonR[i].name +" </option>"; 
+                    element.innerHTML += chain;
+                };
+            }
+        }	
+           
+     var queryString = "http://sleepy-shore-2585.herokuapp.com/api/grade";
+     ajaxQuery.open("GET", queryString, false, "etienne", "makalu" );
+     ajaxQuery.send(null);
+    }
+    
+    
+     function getSites(){
+    	
+    	var ajaxQ = new XMLHttpRequest();
+    	ajaxQ.onreadystatechange = function () {
+    		if(ajaxQ.readyState==4 && ajaxQ.status==200){
+    			var jsonR = JSON.parse(ajaxQ.responseText); //Traduction de la réponse en JSON
+                element = document.getElementById('sitelist');                     
+                for (i = 0; i < jsonR.length; i++){
+                	chain = "<option value=" + jsonR[i].slug + "> " + jsonR[i].name +" </option>"; 
+                    element.innerHTML += chain;
+                };
+            }
+        }	
+           
+     var queryString = "http://sleepy-shore-2585.herokuapp.com/api/site";
+     ajaxQ.open("GET", queryString, false, "etienne", "makalu" );
+     ajaxQ.send(null);
+    }   
+    
+    
+    
+    
+    function onSuccess(position) {
+         jstar.latitude = position.coords.latitude;
+         jstar.longitude = position.coords.longitude;
+         jstar.altitude = position.coords.altitude;
+         jstar.accuracy = position.coords.accuracy;
+         
+         var element = document.getElementById('submeat');
+         element.innerHTML = "<button id='submeat'class='btn btn-success' onClick='send()'> Ajouter </button>";
+    }
+
+    // onError Callback receives a PositionError object
+
+    function onError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
+    }
+    
+    
+    
+    
+     function send(newform) {     
+           jstar.name = document.newform.name.value;
+           jstar.grade = document.newform.grade.value;
+           jstar.site = document.newform.site.value;
+           jstar.abstract = document.newform.abstract.value;
+           alert(jstar.name + jstar.grade + jstar.site + jstar.abstract);
+           var ajaxRequest = new XMLHttpRequest();                
+           var queryString = "http://sleepy-shore-2585.herokuapp.com/api/line/";
+           
+           
+           ajaxRequest.onreadystatechange = function () {   
+           	     alert("ready state = " + ajaxRequest.readyState + " , status = " + ajaxRequest.status);    
+                 if(ajaxRequest.readyState==4 && ajaxRequest.status==201){
+                     alert("Envoie réussi");
+                }
+           }
+           
+           ajaxRequest.open("POST", queryString, false, "etienne", "makalu" );
+           ajaxRequest.setRequestHeader("Content-Type","application/json");
+           chain = '{"name": "' + jstar.name + 
+              '", "grade": "http://sleepy-shore-2585.herokuapp.com/api/grade/7a/"' +
+              ', "sector": "http://sleepy-shore-2585.herokuapp.com/api/sector/surprise"' +
+              ', "abstract": "' + jstar.abstract +
+              '", "latitude":' + jstar.latitude +
+              ', "longitude":' + jstar.longitude + 
+              ', "altitude": 100' + 
+              ', "accuracy":' + jstar.accuracy + '}';
+           alert(chain);
+           ajaxRequest.send(chain);
+           alert("send under work");
+       }
+          
+          
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+   
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+      body {
+        color: #4E5053;    
+      }
+       
+     .navbar navbar-inverse navbar-fixed-top{ }
+ </style>
+ <link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+
+	<div id="navigation"> </div>
+
+    <div class="container">
+
+      <h4>Envoyer une voie </h4>
+
+    <form role="form" name="newform">  
+      
+   
+    
+    <b>Name</b>
+    <div class="form-group">  <input type="text" class="form-control" name="name" placeholder="Nom de la voie/bloc"> </div> <br>
+    
+    <b>Cotation</b>
+    <div class="col-lg-2"> 
+    <select class="form-control" id="gradelist" name="grade" placeholder="select" >
+
+    </select> </div>  <br>
+    
+    <b>Site</b>
+    <div class="col-lg-2"> 
+    <select class="form-control" id="sitelist" name="site" placeholder="select" >
+    </select> </div>  <br>
+    
+    
+    <b>Description</b>
+    <div class="form-group">   <textarea class="form-control" name="abstract" rows="3"> </textarea> </div> <br>
+   
+    
+
+      
+     <div id="submeat"> 
+      <button type="submit" id="submeat" class="btn btn-danger" onClick="" disabled> Attente du GPS... </button>
+    </div>
+   </form>
+ 
+  </div>     <!-- /container -->
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->     
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+	<script src="js/navigation.js"></script>    
+  </body>
+</html>

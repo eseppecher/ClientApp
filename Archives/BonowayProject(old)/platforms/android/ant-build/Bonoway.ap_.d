@@ -1,0 +1,25 @@
+/Users/etienne/Workspace/BonowayProject/platforms/android/ant-build/Bonoway.ap_ \
+ : /Users/etienne/Workspace/BonowayProject/platforms/android/res/drawable/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/res/drawable-hdpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/res/drawable-ldpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/res/drawable-mdpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/res/drawable-xhdpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/res/values/strings.xml \
+/Users/etienne/Workspace/BonowayProject/platforms/android/res/xml/config.xml \
+/Users/etienne/Workspace/BonowayProject/platforms/android/ant-build/res/drawable/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/ant-build/res/drawable-hdpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/ant-build/res/drawable-ldpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/ant-build/res/drawable-mdpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/ant-build/res/drawable-xhdpi/icon.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/_where-is-www.txt \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/cordova.js \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/cordova_plugins.js \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/css \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/img \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/index.html \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/js \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/css/index.css \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/img/logo.png \
+/Users/etienne/Workspace/BonowayProject/platforms/android/assets/www/js/index.js \
+/Users/etienne/Workspace/BonowayProject/platforms/android/ant-build/AndroidManifest.xml \

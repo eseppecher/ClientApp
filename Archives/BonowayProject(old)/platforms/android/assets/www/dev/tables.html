@@ -1,0 +1,98 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="phonegap.js"></script>
+    <script src="js/xdb.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    
+  
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() { 
+       var element = document.getElementById('boutons');
+       alert("Device is ready");
+    }   
+
+    function disp(x) { 
+    	
+    	var query = "SELECT * FROM " + x; 
+        var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);
+          
+        db.transaction(function (tx){ tx.executeSql( query, [], listing, onError )});
+
+    }  
+
+   function listing(tx, results){
+   	
+         var len = results.rows.length;
+         var chain= "";
+         var superchain= "";
+         var element = document.getElementById('listing');
+         element.innerHTML = "";
+         for (i = 0; i < len; i++){
+            superchain = "<li class='list-group-item'> " + results.rows.item(i).name + "</li>";
+            element.innerHTML += superchain;
+         }
+   }
+
+ 
+          
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+    body {
+        color: #4E5053;   
+    }
+      
+    .navbar navbar-inverse navbar-fixed-top{ }
+</style>
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+	<div id="navigation"> </div>
+
+
+    <div class="container">
+
+    <p>Gestion des tables necessaires aux favoris.</p>
+     
+   <div id="boutons">  
+   <button type="button" class="btn btn-default" onClick="disp('sites')" > sites </button>  
+   <button type="button" class="btn btn-default" onClick="disp('parkings')" > parkings </button> 
+   <button type="button" class="btn btn-default" onClick="disp('paths')" > paths </button>  
+   <button type="button" class="btn btn-default" onClick="disp('secteurs')" > secteurs </button>  
+   <button type="button" class="btn btn-default" onClick="disp('lines')" > lines </button>    
+   </div>
+  
+   <div id="listing"> </div>
+ 
+  </div>
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+	<script src="js/navigation.js"></script>
+	
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html class="no-js" lang="fr-FR" ng-app="myApp">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Bonoway Beta</title>
+	<meta name="eseppecher" content="JVercout - jerome.vercoutere@gmail.com" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;"/>
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="cordova_plugins.js"></script>
+	<script type="text/javascript" src="js/init.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/modernizr.min.js"></script>
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/angular-touch.min.js"></script>
+    <script type="text/javascript" src="js/angular-route.min.js"></script>
+    <script type="text/javascript" src="js/angular-resource.min.js"></script>
+    <script type="text/javascript" src="js/angular-sanitize.js"></script>
+    
+    
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" src="assets/js/plugins/lodash/lodash.min.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/angular-google-maps/angular-google-maps.min.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/angular-local-storage/angular-local-storage.min.js"></script>
+    <script type="text/javascript" src="assets/js/plugins/angular-websql/angular-websql.min.js"></script>
+
+	<script type="text/javascript" src="assets/js/scripts.min.js"></script>
+    
+    
+
+	<link rel="stylesheet" href="assets/css/app.min.css"/> <!-- Include all less files PB WITH FONT-AWESOME-->
+    <link rel="stylesheet" href="css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="css/bonoway.css"/>
+    
+    <style>
+        
+        /* style building area : DEFINITVE STYLE SHOULD BE STORE IN CSS/BONOWAY.CSS */
+    
+    </style>
+    
+</head>
+
+<body ng-controller="mainController" ng-app="myApp" >
+	
+
+    <div class="row primarybar">
+        <a href="#/sites" class="col-xs-2" ng-class="{ here: isActive('/sites')}"> <i class="fa fa-home"></i> </a>
+        <a href="#/search" class="col-xs-2" ng-class="{ here: isActive('/search')}"> <i class="fa fa-search"></i> </a>
+        <a href="#/photo" class="col-xs-2" ng-class="{ here: isActive('/photo')}"> <i class="fa fa-camera"></i> </a>
+        <a href="#/about" class="col-xs-2 pull-right" ng-class="{ here: isActive('/about')}"> <i class="fa fa-info"></i> </a>
+    </div>
+	
+	<main role="main" class="container-fluid adjust">
+        
+    <div ng-view></div>
+    
+	</main>
+	
+
+
+	<!--  <script>
+	window.globalParams = {};
+	globalParams.urlapp = 'http://beta.bonoway.dev/#';
+	</script>-->
+
+</body>
+</html>

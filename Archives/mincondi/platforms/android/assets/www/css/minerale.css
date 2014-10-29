@@ -1,0 +1,108 @@
+/*!
+ * Minerale CSS v1.0
+ */
+
+
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0 }
+
+  /*! googlemap display div */
+  #map-canvas {
+    height: 100%;
+    background-color: transparent;
+  }
+   
+  /*! App name section maybe logo to come */ 
+  #header {
+    z-index: 5;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    text-align: center;
+    color: #5bc0de;
+    text-shadow: #FEFEFE 1px 1px,
+				 #FEFEFE -1px 1px,
+				 #FEFEFE -1px -1px,
+				 #FEFEFE 1px -1px;
+    pointer-events: none;
+  }
+   
+   
+  /*! switch buttons section METEO/ICI */
+  #switch {
+    z-index: 5;
+    position: fixed;
+    width: 300px;
+    left: 50%;
+    top: 85%;
+    margin-left: -150px;
+    text-align: center;
+  }
+  
+  /*! time slider div CURRENTLY UNUSED  */ 
+  #range {
+    z-index: 5;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    text-align: center;
+    color: #FBFBFB;
+    background-color: rgba(206, 206, 206, 0.8);
+    visibility : collapse;
+  }
+  
+  .slider-selection {background: #1D93DD;} 
+  .slider-track {background: #FBFBFB;}  
+  .slider-handle { background: #FBFBFB; }
+  
+   /*! btn specific  */ 
+  .btn{ z-index: 5;}
+   
+   /*! btn specific SWITCH (METOE/ICI) */
+  .btn-lh {
+    padding: 10px 15px;
+    width: 100px;
+    font-size: 18px;
+    line-height: 1.33;
+    border-radius: 6px;
+  }
+   
+   /*! btn white typo blue  */
+  .btn-condi{
+   	z-index: 5;
+   	color: #5bc0de;
+  	background-color: #fff;
+  	border-color: #5bc0de;
+  }
+  
+  .btn-condi:hover,
+  .btn-condi:focus,
+  .btn-condi:active,
+  .btn-condi.active,
+  .open .dropdown-toggle.btn-condi {
+   	z-index: 5;
+   	color: #5bc0de;
+  	background-color: #fff;
+  	border-color: #5bc0de;
+}
+  
+  
+  /*! darkening a bit active mod of btn-info  */ 
+  .btn-info:active{ background-color: #359CBF;}
+  
+  /*! img radio design  */
+  .fb > input[type=radio]{ display:none;}
+
+  input[type=radio] + img{
+  	height: 100px;
+    cursor:pointer;
+    opacity: 1; 
+    border:2px solid transparent;
+  }
+  
+  input[type=radio]:checked + img{
+  	height: 120px;
+    opacity: 1;
+    border:0; 
+  }

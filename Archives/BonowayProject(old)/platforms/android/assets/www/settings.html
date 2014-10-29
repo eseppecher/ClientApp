@@ -1,0 +1,91 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="cordova.js"></script>
+    <script src="js/xdb.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    
+  
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() { 
+       var element = document.getElementById('boutons');
+       element.innerHTML = '<button type="button" class="btn btn-danger" onClick="reset(createSites)" > Créer/vider la table "sites" </button> <br> <br>' ;
+       element.innerHTML += '<button type="button" class="btn btn-danger" onClick="reset(createParkings)" > Créer/vider la table "Parkings" </button> <br> <br>'
+      + '<button type="button" class="btn btn-danger" onClick="reset(createPaths)" > Créer/vider la table "Paths" </button> <br> <br>'
+      + '<button type="button" class="btn btn-danger" onClick="reset(creatSecteurs)" > Créer/vider la table "Secteurs" </button> <br> <br>'
+      + '<button type="button" class="btn btn-danger" onClick="reset(createLines)"> Créer/vider la table "lines" </button>';
+       alert("Device is ready");
+    }   
+
+       
+
+ 
+          
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+    body {
+        color: #4E5053;   
+    }
+      
+    .navbar navbar-inverse navbar-fixed-top{ }
+</style>
+
+
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+	<div id="navigation"> </div>
+
+
+    <div class="container">
+
+    <p>Gestion des tables necessaires aux favoris.</p>
+     
+   <div id="boutons">  
+   
+   
+   <button type="button" id="erasev"class="btn btn-danger" disabled> Créer/vider la table "Sites" </button>
+   <br> <br>
+   <button type="button" id="erases"class="btn btn-danger" disabled> Créer/vider la table "Parkings" </button>  
+   <br> <br>
+   <button type="button" id="erases"class="btn btn-danger" disabled> Créer/vider la table "Paths" </button>  
+   <br> <br>
+   <button type="button" id="erases"class="btn btn-danger" disabled> Créer/vider la table "Sectors" </button>  
+   <br> <br>
+   <button type="button" id="erases"class="btn btn-danger" disabled> Créer/vider la table "Lines" </button>  
+   </div>
+ 
+<br> <button type="button" class="btn btn-default" onClick="window.location.href = 'dev/tables.html';" >  Voir les tables </button>
+  </div>
+
+  <br>
+ <button type="button" class="btn btn-primary" onClick="window.location.href = 'tools/gpsTest.html';" >  Diagnostic GPS </button> 
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+	<script src="js/navigation.js"></script>
+	
+  </body>
+</html>

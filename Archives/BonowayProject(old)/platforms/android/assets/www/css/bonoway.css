@@ -1,0 +1,52 @@
+/*!
+ * Bonoway CSS v1.0
+ */
+
+
+
+body {
+   color: #4E5053;   
+}
+
+a {
+	color: #4E5053;
+    background: transparent;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+
+
+.list-group-item > .badge{
+    
+}
+.justified{
+	float: none;
+}
+.badge-route{
+    background: #e51940; /*! ROUTE COLOR : RED v1.0 */
+}
+
+.badge-boulder{
+    background: #dde82b; /*! BOULDER COLOR : YELLOW v1.0 UGLY!!!!*/
+}
+
+.badge-bigwall{
+    background: #4970ee; /*! BOULDER COLOR : YELLOW v1.0 */
+}
+
+/* "fonctions" gather buttons btn-rs : modify, send, delete  */
+  .fonctions{
+  	margin : -10px -10px;
+  	float: right;
+  }    
+  
+.btn-rs {
+	margin-top: -1px;
+	margin-right: -5px;
+  padding: 10px 7px;
+  font-size: 15.4px;
+  line-height: 1.35;
+  border-radius: 2px;
+}

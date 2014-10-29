@@ -1,0 +1,110 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->
+  <script src="cordova.js"></script>
+  <script type="text/javascript" charset="utf-8">
+    
+
+        document.addEventListener('deviceready', this.onDeviceReady, false);
+
+
+     function onDeviceReady() {
+        alert('deviceready');
+    }
+
+    function errorCB(tx, err) { alert("Error processing SQL: "+err);} 
+    function successCB() { alert('success!!!!');}
+     
+    function processSQL(tx){
+    var query = 'INSERT INTO matable (name) VALUES ("aaa")'; 
+         tx.executeSql(query);
+     }
+     
+     function finish() { //push site into db
+       	var db = window.openDatabase("myDB", "1.0", "DB", 1000000);
+        db.transaction(processSQL, errorCB, successCB);  
+        //relocate();
+       }
+       
+    function reset() {         
+          var db = window.openDatabase("myDB", "1.0", "DB", 1000000);
+          alert("base de donnée ouverte");
+          db.transaction(createTable, errorCB, successCB);  
+    }  
+     
+   function createTable(tx) {
+         alert("processing on the way");
+         tx.executeSql('DROP TABLE IF EXISTS matable');      
+         alert("desturction de la table si elle n'existe pas");  
+         tx.executeSql('CREATE TABLE IF NOT EXISTS matable (name varchar(255))');
+         alert("base de donnée ouverte");
+    }
+     
+     
+     function test() {         
+          var db = window.openDatabase("myDB", "1.0", "DB", 1000000);
+          alert("base de donnée ouverte");
+          db.transaction(testTable, errorCB, successCB);  
+    } 
+    
+    function testTable(tx) {
+         alert(tx.executeSql("SELECT name FROM sqlite_master WHERE type='table' AND name='matable'"));      
+    }
+    
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+   
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-select.css" rel="stylesheet">
+<link href="css/bonoway.css" rel="stylesheet">
+
+
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+
+
+    <div id="container" class="container">
+    
+      <button type="button" class="btn btn-danger" onClick="reset()" > Cr√©er/vider Table </button> <br> <br>
+        
+      <button class="btn btn-default" onClick="finish()"> Enregistrer. <span class="glyphicon glyphicon-ok"  ></span>  </button>
+      
+      <br> <br>
+        
+      <button class="btn btn-info" onClick="test()"> Table existe? </button>
+      
+      
+    
+    </div> 
+
+
+
+
+
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->     
+    
+  <script src="js/jquery.js"></script>
+  <script src="js/bootstrap-collapse.js"></script>      
+  <script src="js/bootstrap-select.min.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+
+    
+    
+  </body>
+</html>

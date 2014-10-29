@@ -1,0 +1,79 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->
+     
+
+
+
+   <!-- ========================= STYLE ========================= -->
+   
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-select.css" rel="stylesheet">
+<link href="css/bonoway.css" rel="stylesheet">
+
+
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+
+<div class="panel panel-info">
+<div class="panel-heading" >
+    <h3 class="panel-title" id="headsection">Etape 0 : Le site.</h3>
+</div>
+
+<div class="panel-body">
+    <div id="tabulation"> </div>
+
+    <div id="container" class="container"></div> 
+
+   <select class="selectpicker">
+   <option>Mustard</option>
+   <option>Ketchup </option>
+   <option>Relish</option>
+   </select>
+                        
+                        
+     <select data-show-icon="true" name="grade"> <option>3a</option> <option>3b</option> <option>3c</option> 
+    <option>4a</option> <option>4b</option> <option>4c</option> <option>5a</option> <option>5a+</option> <option>5b</option> <option>5b+</option> <option>5c</option> 
+    <option>5c+</option> <option>6a</option> <option>6a+</option> <option>6b</option> <option>6b+</option> <option>6c</option> <option>6c+</option> <option>7a</option> 
+    <option>7a+</option> <option>7b</option> <option>7b+</option> <option>7c</option> <option>7c+</option> <option>8a</option> <option>8a+</option> <option>8b</option>
+    <option>8b+</option> <option>8c</option> <option>8c+</option> <option>9a</option> <option>9a+</option> <option>9b</option> <option>9b+</option> </select>
+
+</div>
+</div>
+
+<center> <button class="btn btn-default" onClick="finish()"> Finish </button> </center>
+
+
+
+
+
+
+
+
+
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->     
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script> 
+    <script src="js/bootstrap-dropdown.js"></script>
+      <script src="phonegap.js"></script>
+  <script src="js/bootstrap-select.min.js"></script>
+        <script type="text/javascript">
+          $('select').selectpicker();
+      </script> 
+  </body>
+</html>

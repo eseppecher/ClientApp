@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta charset="utf8" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /> <title>Map</title>
+        
+<!-- ========================= STYLE ========================= -->     
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="css/slider.css" />
+<link rel="stylesheet" type="text/css" href="css/minerale.css" />
+
+<style>
+
+  #container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+	
+  .initialize {
+  	position: fixed;
+  	top: 0px;
+  	left:0px;
+  	height: 50%;
+  	width: 84%;
+    margin-top: 8%;
+	margin-left: 8%;
+	margin-right: 8%;
+	text-align: center;	
+  }
+</style> 
+
+<!-- div to implement design in case of initialization -->
+<style id="design">  </style>      
+        
+</head>      
+    <body>
+    	
+<!-- ========================= Modals CURRENTLY UNUSED========================= -->
+    	 
+  <div class="modal fade" id="welcomeModal">
+  	<div class="modal-dialog">
+    	<div class="modal-content">
+        <h4> Bonjour, " + name + ", bienvenu dans la communaute de Condition Minerales!!!</h4>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Decouvrir l'application</button>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+    	
+<!-- ========================= HTML ========================= -->
+    	
+	<div id="header"> <b><h3>  Conditions Minerales</h3> </b></div>
+	
+	<div id='overlay'> </div>
+    
+    <div id="switch">
+  		<div class="btn-group"> <button type="button" class="btn btn-info btn-lh active" onclick="window.location.href = 'index.html';">METEO</button>
+  		<button type="button" class="btn btn-info btn-lh" onclick="window.location.href = 'add.html';"> ICI <span class="glyphicon glyphicon-map-marker"></span> </button> </div>
+	</div>
+    
+    <!-- CURRENTLY HIDDEN AND UNUSEDED -->  
+	<div id="range"> 
+       	<h4> Date des donnees</h4>	
+		<input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="15" data-slider-step="1" data-slider-value="3"/>
+	</div>
+	
+	<div id="map-canvas" class="map-canvas"> </div>
+			    
+
+<!-- ========================= JAVASCRIPT ========================= -->
+<script type="text/javascript" src="cordova.js"></script>
+<!-- <script type="text/javascript" src="js/bootstrap.js"></script> -->
+<!-- <script type="text/javascript" src="js/bootstrap-modal.js"></script> -->
+
+<script type="text/javascript" src="js/yinitialize.js"></script>
+
+<!--  <script type="text/javascript" src="js/jquery.js"></script> 
+<script type="text/javascript" src="js/bootstrap-slider.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+         $('#ex1').slider({ formater: function(value) { return  value + 'jours';}});
+</script> -->
+
+          
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&sensor=false"></script>
+
+<script type="text/javascript" charset="utf-8">    
+    
+    document.addEventListener("deviceready", getDatas, false);
+    
+    function getDatas(){
+    	var ajaxQuery = new XMLHttpRequest();
+    	ajaxQuery.onreadystatechange = function () {
+    		if(ajaxQuery.readyState==4 && ajaxQuery.status==200){
+    			var jsonR = JSON.parse(ajaxQuery.responseText); //Traduction de la réponse en JSON                    
+                displayMarkers(jsonR);
+            }
+        }	
+     	var queryString = "http://mineral.herokuapp.com/conditions";
+     	ajaxQuery.open("GET", queryString, false);
+     	ajaxQuery.send(null);
+    }
+    
+    var styles = [
+  		{
+    		featureType: "all",
+    		stylers: [
+		      { saturation: -30 }
+    		]
+  		},{
+    		featureType: "road.arterial",
+    		elementType: "geometry",
+    		stylers: [
+      		{ hue: "#00ffee" },
+      		{ saturation: 30 }
+    		]
+  		},{
+    		featureType: "poi.business",
+    		elementType: "labels",
+    		stylers: [
+      		{ visibility: "off" }
+    		]
+  		}
+	];
+
+	var styledMap = new google.maps.StyledMapType(styles, {name: "Styled Map"});
+
+    var mapOptions = {
+       zoom:5,
+       center: new google.maps.LatLng(44.932953, 4.897759),
+       mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style'],
+       panControl: false,
+       zoomControl: false,
+       mapTypeControl: false,
+       scaleControl: false,
+       streetViewControl: false,
+       overviewMapControl: false
+    };
+
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+	map.mapTypes.set('map_style', styledMap);
+	map.setMapTypeId('map_style');
+
+	function displayMarkers(json){
+		var sunny = {
+    		url: 'img/sunny.png',
+    		// This marker is 20 pixels wide by 32 pixels tall.
+    		size: new google.maps.Size(80, 80),
+    		// The origin for this image is 0,0.
+    		//origin: new google.maps.Point(0,-10),
+    		// The anchor for this image is the base of the flagpole at 0,32.
+    		anchor: new google.maps.Point(20, 50)
+  		};
+
+   		var cloudy = {
+    		url: 'img/cloudy.png',
+    		// This marker is 20 pixels wide by 32 pixels tall.
+    		size: new google.maps.Size(80, 80),
+    		// The origin for this image is 0,0.
+    		//origin: new google.maps.Point(0,-10),
+    		// The anchor for this image is the base of the flagpole at 0,32.
+    		anchor: new google.maps.Point(20, 50)
+  		};
+
+
+		for (var i = 0; i < json.length; i++){
+   
+   			if(json[i].weather=="sunny"){ 
+   				var marker = new google.maps.Marker({ position: new google.maps.LatLng(json[i].location.latitude, json[i].location.longitude), map: map, clickable: true, icon: sunny, title: "Weather"});
+   			}
+	   		else{
+	    		var marker = new google.maps.Marker({ position: new google.maps.LatLng(json[i].location.latitude, json[i].location.longitude), map: map, clickable: true, icon: cloudy, title: "Weather"});
+	    	}
+    
+	    	marker.content = '<b> ' + json[i].name + ': </b> "' + json[i].message + '"';
+	    
+	    	var infoWindow = new google.maps.InfoWindow();    
+			google.maps.event.addListener(marker, 'click', function () {
+                infoWindow.setContent(this.content);
+                infoWindow.open(this.getMap(), this);
+	    	});
+    	} 
+ 	}
+</script>
+
+</body>
+</html>

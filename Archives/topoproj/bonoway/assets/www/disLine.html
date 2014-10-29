@@ -1,0 +1,193 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    
+    <!-- Le styles -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        color: #4E5053;  
+      }
+      
+html, body, #map-canvas {
+        width: 95%;
+        height: 95%;
+       }
+      
+.navbar navbar-inverse navbar-fixed-top{
+ 
+}
+    </style>
+    <link href="../css/bootstrap-responsive.css" rel="stylesheet">
+
+</head> 
+<body> 
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="index.html"> Bonoway Mango</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="addLine.html"> <i class="icon-plus icon-white"></i> Ajouter une ligne </a></li>
+              <li><a href="addCrag.html"> <i class="icon-plus icon-white"></i> Ajouter un site </a></li>
+              <li><a href="listLines.html"> <i class="icon-th-list icon-white"> </i> Voies </a></li>
+              <li><a href="listCrags.html"> <i class="icon-th-list icon-white"> </i> Sites </a></li>
+              <li><a href="mapLines.html"> <i class="icon-map-marker icon-white"> </i> Carte des voies </a></li>
+              <li><a href="mapCrags.html"> <i class="icon-map-marker icon-white"> </i> Carte des sites </a></li>
+              <li><a href="settings.html"> <i class="icon-wrench icon-white"> </i> Réglages </a></li>              
+              <li><a href="dev/testarea.html"> - Developpement- </a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container" id="container">
+    <h4> Loading... </h4>
+
+    
+    </div> 
+      
+    <div id="map-canvas"></div>
+    
+    
+    
+    // -------------- SCRIPTS -----------------------------------------------------------------
+    
+          
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&sensor=false"></script>   
+
+    <script type="text/javascript" charset="utf-8">
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {           
+                   
+         // recuperation id line from nom & site  
+         nom = "";
+         site = "";
+         var requete = window.location.search ; 
+         if (requete) {
+             requete = requete.substring(1) ; 
+             requete = unescape(requete) ; 
+             eval(requete); } 
+                
+                
+         var query = "SELECT * FROM lines WHERE nom = '" + nom + "' AND site ='" + site + "'" ; 
+        
+         var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);
+         db.transaction(function (tx){ tx.executeSql( query, [], dispEntry, onError )});
+           
+    }
+    
+
+      function onError(tx, err) {
+           alert("Error processing SQL: "+err);
+      }
+           
+      function dispEntry(tx, results){
+        var element = document.getElementById('container');
+        element.innerHTML = " <h4> " + results.rows.item(0).nom + " , " + results.rows.item(0).cote + " , " + results.rows.item(0).site +" </h4>";
+        element.innerHTML += "accuracy : " + results.rows.item(0).accuracy + " , altitude : " + results.rows.item(0).altitude;
+        element.innerHTML += '<br>' + '<button type="button" class="btn btn-info" onClick="envoyer()"> Envoyer </button>'
+        var x = results.rows.item(0).latitude;
+        var y = results.rows.item(0).longitude;
+        var nom = results.rows.item(0).nom;
+        var site = results.rows.item(0).site;
+
+        
+        
+        var mapOptions = {
+               zoom: 17,
+               center: new google.maps.LatLng(x,y),
+               mapTypeId: google.maps.MapTypeId.SATELLITE
+        };
+
+        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        
+        
+    var contentString = '<div id="content">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h4 id="firstHeading" class="firstHeading">' + results.rows.item(0).nom +
+      ', ' + results.rows.item(0).cote +
+      '</h4> <div id="bodyContent">'+
+      '<p>' + results.rows.item(0).site +  
+      '</p> </div>'+
+      '</div>';
+         
+
+  var infowindow = new google.maps.InfoWindow({
+      content: contentString
+  });
+
+    
+        var marker = new google.maps.Marker({
+              position:  new google.maps.LatLng(x, y),
+              map: map,
+             title: "test"
+        });
+        
+       google.maps.event.addListener(marker, 'click', function() {
+           infowindow.open(map,marker);
+      });
+    }
+    
+    
+    
+    
+    function envoyer(){
+           alert("envoyer started");
+           var ajaxRequest;  // The variable that makes Ajax possible!
+           ajaxRequest = new XMLHttpRequest();	
+           // Now get the value from user and pass it to
+           // server script.
+           alert("envoyer on the way");
+
+          
+          var queryString = "http://etienne.seppecher.free.fr/index.php" + "?nom=" + nom + "&site=" + site;
+          alert(queryString);
+           alert(ajaxRequest.readyState); 
+           ajaxRequest.open("GET", queryString, false);
+           alert(ajaxRequest.readyState); 
+           ajaxRequest.send(null);
+           alert(ajaxRequest.readyState + "done!"); 
+}
+    
+    
+    
+    
+    </script>
+
+   
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap-transition.js"></script>
+    <script src="../js/bootstrap-alert.js"></script>
+    <script src="../js/bootstrap-modal.js"></script>
+    <script src="../js/bootstrap-dropdown.js"></script>
+    <script src="../js/bootstrap-scrollspy.js"></script>
+    <script src="../js/bootstrap-tab.js"></script>
+    <script src="../js/bootstrap-tooltip.js"></script>
+    <script src="../js/bootstrap-popover.js"></script>
+    <script src="../js/bootstrap-button.js"></script>
+    <script src="../js/bootstrap-collapse.js"></script>
+    <script src="../js/bootstrap-carousel.js"></script>
+    <script src="../js/bootstrap-typeahead.js"></script>
+
+  </body>
+</html>

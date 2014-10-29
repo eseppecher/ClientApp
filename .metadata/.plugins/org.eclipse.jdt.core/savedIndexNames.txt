@@ -1,0 +1,10 @@
+INDEX VERSION 1.126+/Users/etienne/Workspace/.metadata/.plugins/org.eclipse.jdt.core
+644341752.index
+2918960433.index
+869377996.index
+760890921.index
+386291777.index
+3120313880.index
+3927879410.index
+780449182.index
+1982641244.index

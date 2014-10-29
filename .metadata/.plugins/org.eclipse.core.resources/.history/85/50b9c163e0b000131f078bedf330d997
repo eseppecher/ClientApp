@@ -1,0 +1,478 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->
+  <script src="js/xdb.js"></script>
+  <script type="text/javascript" charset="utf-8">
+
+// GPS global variables 
+
+     var  CurrentLatitude = 0;
+     var  CurrentLongitude = 0;
+     var  CurrentAltitude = 0;
+     var  CurrentAccuracy = 0; 
+     var accuracy = 1000;
+     var bestaccuracy = 1000;
+     var  gpsoff = false;
+     
+     var addType = "";
+     var currentSecteur= -1;
+     var currentLine = -1;
+
+// Reuperation du json si mode=edition sinon initialisation des données     
+    var json = "";
+
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+    	var requete = window.location.search ; 
+    	if (requete) {
+             requete = requete.substring(1) ; 
+             requete = unescape(requete) ; 
+             eval(requete); 
+    	} 
+    	if(json === ""){
+    		json = {
+                "SiteName":  "",
+                "SiteSlug": "",
+                "SiteAbstract": "",
+                "linenb" : 0,
+                "SiteGPS": {
+                   "Latitude": 0,
+                   "Longitude": 0,
+                   "Altitude": 0,
+                   "Accuracy": 0
+                          },
+                "Secteur" : []
+            };
+        	var i = -1; //compteur de secteurs
+     		var j = -1; //compteur de voies
+     		var element = document.getElementById('finish');
+           	var chain = "prefinish('new')";
+            element.innerHTML = '<button class="btn btn-default" onClick="' + chain  +'"> Enregistrer et terminer. <span class="glyphicon glyphicon-ok"  ></span>  </button>';
+        	nextstep("",0,""); 
+    	}
+    	else{
+    		json = JSON.parse(json);
+    		alert("editing " + json.SiteName);
+    		var i = json.Secteur.length; //compteur de secteurs
+     		var j = -1; //compteur de voies
+     		var element = document.getElementById('finish');
+           	var chain = "prefinish('edit')";
+            element.innerHTML = '<button class="btn btn-default" onClick="' + chain  +'"> Enregistrer et terminer. <span class="glyphicon glyphicon-ok"  ></span>  </button>';     		
+     		nextstep("",1,"favoris");
+    	}  
+    }
+    
+    function myEncode(str) {
+        return encodeURIComponent(str).replace(/\'/g, "%2B");
+        //return decodeURI("%2B");
+    }
+    
+    function myDecode (str) {
+    	return decodeURI(str.replace("%2B", "'"));
+    }
+    function gpsTriger(){
+    	CurrentLatitude = 0;
+    	CurrentLongitude = 0;
+    	CurrentAltitude = 0;
+    	CurrentAccuracy = 0;
+    	accuracy = 1000;
+    	bestaccuracy = 1000;
+    	gpsoff = false;
+    	navigator.geolocation.getCurrentPosition(gpsOptimisation, onError, {enableHighAccuracy: true});
+    }
+ 
+    function gpsOptimisation(position) {
+   	accuracy = position.coords.accuracy; 
+    if(gpsoff == true){
+    	return;
+    }
+
+   	if(accuracy<=2){ // A partir d'une précision limite ici 2 on stop l'optimisation
+   		gpsResults(position); 
+   		}
+   	else{ // Sinon on continue l'optimisation
+   		if(accuracy<bestaccuracy){ // si la dernière requete est la plus précise alors elle est mémorisée.
+   			
+              CurrentLatitude = position.coords.latitude;
+              CurrentLongitude = position.coords.longitude;
+              CurrentAltitude = position.coords.altitude;
+              CurrentAccuracy = position.coords.accuracy; 
+   		      bestaccuracy = accuracy;
+   		      
+   		     var elementgps = document.getElementById('gpssection');
+   		     //affichage de la precision dans l'onglet gpssection
+   		     if(bestaccuracy<=2){
+   		     	elementgps.innerHTML = '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">' + bestaccuracy + 'm </div>';
+   		     	
+   		     } else{ if(bestaccuracy<=3){	
+   		     	elementgps.innerHTML = '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 90%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=4){	
+   		     	elementgps.innerHTML = '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 85%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=5){	
+   		     	elementgps.innerHTML = '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 80%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=7){
+   		      	elementgps.innerHTML = '<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 70%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=10){
+   		      	elementgps.innerHTML = '<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=15){
+   		      	elementgps.innerHTML = '<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=20){
+   		      	elementgps.innerHTML = '<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 40%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=40){
+   		      	elementgps.innerHTML = '<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 30%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=60){
+   		      	elementgps.innerHTML = '<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%;">' + bestaccuracy + 'm </div>';
+   		     } else{ if(bestaccuracy<=100){
+   		      	elementgps.innerHTML = '<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 10%;">' + bestaccuracy + 'm </div>';
+               }}}}}}}}}}}   		
+   		    
+   		     navigator.geolocation.getCurrentPosition(gpsOptimisation, onError, {enableHighAccuracy: true});
+   		  } 	
+   		  navigator.geolocation.getCurrentPosition(gpsOptimisation, onError, {enableHighAccuracy: true}); 
+      }
+   } 
+    function gpsResults(position) {
+          CurrentLatitude = position.coords.latitude;
+          CurrentLongitude = position.coords.longitude;
+          CurrentAltitude = position.coords.altitude;
+          CurrentAccuracy = position.coords.accuracy;        
+    }
+
+    function onError(error) {  alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n'); }
+    
+    function path() {  alert('La fonction "path" nest pas dévelopée'); }
+    
+    function editSecteur(x){currentSecteur = x; nextstep('',1,'plansecteur'); }
+    function deleteSecteur(x){ json.Secteur.splice(x,1); 
+    	
+    	nextstep('',1,'favoris');}
+    function fillSecteur(x){currentSecteur = x; nextstep('',2,'plansecteur'); }
+
+    function addLine(){nextstep('',2,'addline'); }    
+    function editLine(x){currentLine = x; nextstep('',2,'editline'); }
+    function deleteLine(x){json.linenb = json.linenb -json.Secteur[x].linenb; json.Secteur[currentSecteur].Voie.splice(x,1); nextstep('',2,''); }
+    
+    function sluger(x){
+    	var y = x.replace(/[ |&;$%@"'<>()+,]/g, "");
+    	alert(y);
+    	return y;
+    }
+    
+    
+    function nextstep(myform,step,source) {
+     	   alert("step = " + step);
+     	       
+           //NEXT STEP STARTING HERE step = step +1;
+           
+           //STEP 0
+           if(step === 0){
+           		var element = document.getElementById('container');
+           		var chain = "nextstep(myform,1,'site')";
+                element.innerHTML = '<form role="form"  name="myform" action="javascript:void(0);">'  +
+           	    	'<b>Nom du site</b> <div class="form-group">  <input type="text" class="form-control" name="name" value="' + json.SiteName + '" placeholder="..."> </div> <br>'+
+                    '<b>Description du site</b> <div class="form-group">   <textarea class="form-control" name="abstract" rows="3" placeholder="...">'+json.SiteAbstract+'</textarea> </div> <br>'+ 
+                    'GPS process : <div class="progress"  id="gpssection">  Searching... </div>'+
+                   '<br> <button type="submit" id="submeat" class="btn btn-info" onclick="'+ chain +'"> Suivant </button>'+	
+                   '</form>';
+                   
+                   gpsTriger();
+           }
+           
+           //STEP 1
+           if(step === 1){
+           	gpsoff = true;
+           	elt = document.getElementById('headsection');
+           	elt.innerHTML = "Etape 1 : Plan des secteurs.";
+           	//Coming from step 0 json addition SAVING SITE ATTRIBUTES
+           	if(source === "site" ){
+           		gpsoff=true;
+           		json.SiteName = myEncode(document.myform.name.value);
+           		json.SiteSlug = sluger(document.myform.name.value);
+            	json.SiteAbstract = myEncode(document.myform.abstract.value);
+            	json.SiteGPS.Latitude = CurrentLatitude;
+            	json.SiteGPS.Longitude = CurrentLongitude;
+            	json.SiteGPS.Altitude = CurrentAltitude;
+            	json.SiteGPS.Accuracy = CurrentAccuracy;
+            }
+            //coming from editing secteur json modif SAVING
+            if(source === "editsecteur" ){
+           		json.Secteur[currentSecteur].name =  myEncode(document.myform.name.value);
+           		json.Secteur[currentSecteur].slug =  sluger(document.myform.name.value);
+            }
+           	// displaying common part
+           	var element = document.getElementById('container');
+           	var chain = "nextstep('',0,'')";
+            element.innerHTML = '<h4>' + myDecode(json.SiteName) + '<button type="button" class="btn btn-default btn-xs" onclick="' + chain + '"> <span class="glyphicon glyphicon-pencil"  ></span></button></h4> <i>' +
+             myDecode(json.SiteAbstract) +'</i>  <br><br><b> Secteurs : </b> <br>';
+           	 
+             
+           	//display standard
+           	var chainlist = '<ul class="list-group">';
+           	if((source === "favoris")||(source === "lines")||(source === "site")||(source === "editsecteur")){
+           		for(var k=0; k<json.Secteur.length; k++){
+              		chainlist = chainlist + ' <li class="list-group-item"><a onclick="fillSecteur(' + k + ')">' + 
+              		myDecode(json.Secteur[k].name)  +
+              		'</a><element class="fonctions"> <button type="button" class="btn btn-default btn-xs" onclick="editSecteur(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-xs" onclick="deleteSecteur('+k+')" > <span class="glyphicon glyphicon-remove"></span></button></element></li>';
+            	}
+
+           		chainlist = chainlist + '</ul> <center> <button class="btn btn-info" onClick="editSecteur(' + json.Secteur.length + ')">  <span class="glyphicon glyphicon-plus"></span> secteur </button> </center>';
+           		element.innerHTML += chainlist;
+       		}
+       		
+           	if(source === "plansecteur"){
+           		for(var k=0; k<currentSecteur; k++){
+              		chainlist = chainlist + ' <li class="list-group-item">' + 
+              		myDecode(json.Secteur[k].name)  + '</li> ';
+            	}
+            	if(currentSecteur === json.Secteur.length){
+            		var chain = "nextstep(myform,2,'newsecteur')";
+            		var valeur = "";
+        		}
+            	else{ 
+            		var chain = "nextstep(myform,1,'editsecteur')";
+            		var valeur = myDecode(json.Secteur[currentSecteur].name);
+        		}
+        		if(json.Secteur[currentSecteur] !== undefined){
+        			 var valeurx=myDecode(json.Secteur[currentSecteur].name);
+        			}else{
+        			 var valeurx= "";
+        				}
+            	chainlist = chainlist + '<li class="list-group-item"> <form role="form" name="myform" action="javascript:void(0);">' +
+                       '<b>Nom du secteur </b> <div class="form-group">  <input type="text" class="form-control" name="name" placeholder="Nom du secteur" value="' + valeurx + '" > </div>' + 
+                       '<br> <button class="btn btn-default" onClick="paht()"> Commencer le chemin. </button> </div> <br>' +
+                       '</div> <br> <button type="submit" id="submeat" class="btn btn-info" onClick="'+chain+'"> Suivant </button>' + 
+                       '</form> </li>';
+            	
+            	for(var k=currentSecteur+1; k<json.Secteur.length; k++){
+              		chainlist = chainlist + ' <li class="list-group-item">' + 
+              		myDecode(json.Secteur[k].name)  + '</li> ';
+            	}
+            	
+           		chainlist = chainlist +  '</ul>';
+           		element.innerHTML += chainlist;
+           	}
+           }
+           
+           
+           //STEP 2 LINES
+           if(step === 2){
+           var elt = document.getElementById('headsection');
+           elt.innerHTML = "Etape 2 : les voies";
+           
+           //Saving new secteur if colming from new secteur
+            if(source === "newsecteur"){
+            	var obj = { "name": myEncode(document.myform.name.value),"slug": sluger(document.myform.name.value), "linenb":0, "Voie" : []};
+     		    json.Secteur.push(obj);
+            }
+           //Saving new line
+            if(source === "newline"){
+            	gpsoff=true;//stop gps
+             	var obj = { "name": myEncode(document.myform.name.value), "grade": document.myform.grade.value, "rate": document.myform.rate.value, 
+             	"latitude": CurrentLatitude, "longitude": CurrentLongitude, "altitude": CurrentAltitude, "accuracy": CurrentAccuracy };
+             	json.Secteur[currentSecteur].Voie.push(obj);
+             	json.linenb = json.linenb + 1; json.Secteur[currentSecteur].linenb = json.Secteur[currentSecteur].linenb + 1;
+            }
+            //Saving edited line
+            if(source === "changeline"){
+            	gpsoff=true;//stop gps
+            	json.Secteur[currentSecteur].Voie[currentLine].name = myEncode(document.myform.name.value);
+                json.Secteur[currentSecteur].Voie[currentLine].grade = document.myform.grade.value;
+                json.Secteur[currentSecteur].Voie[currentLine].rate = document.myform.rate.value;
+            }
+           
+            
+            // displaying common part
+            var element = document.getElementById('container');
+            var charchain = "nextstep('',1,'lines')";
+            element.innerHTML = '<center> <button class="btn btn-default" onClick="' + charchain + '"> Plan des secteurs. </button> </center>' +
+            					"<h4> Secteur : " + myDecode(json.Secteur[currentSecteur].name) + "</h4>";
+            		 
+            
+            element.innerHTML += '<ul class="list-group">';
+            
+             //displaying specific
+             ////////////////////////////ADD LINE display
+            if(source === "addline"){ //adding lines
+            	alert("addline mode");
+              	for(var k=0; k<json.Secteur[currentSecteur].Voie.length; k++){
+              		var chain = ' <li class="list-group-item">' + 
+              	 	myDecode(json.Secteur[currentSecteur].Voie[k].name)  + ' ' + json.Secteur[currentSecteur].Voie[k].grade + ' ' + json.Secteur[currentSecteur].Voie[k].rate + 
+              	 	'<element class="fonctions"> <button type="button" class="btn btn-default btn-xs" onclick="editLine(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-xs" onclick="deleteLine(' + k + ')" > <span class="glyphicon glyphicon-remove"></span></button></element> </li>';
+					element.innerHTML += chain;
+              	}
+            	
+            	var chainx = "nextstep(myform,2,'newline')";
+            	var chainy = "<span class='glyphicon glyphicon-star'></span>";
+            	var chainz = "<span class='glyphicon glyphicon-thumbs-down'></span>";
+  
+            	element.innerHTML += '<li class="list-group-item"> <form role="form" name="myform" action="javascript:void(0);"> <div class="form-group">' +  
+            	    '<input type="text" class="form-control" name="name" placeholder="Nom de la voie"> </div>' + 
+                    
+                    '<select name="grade" class="selectpicker show-tick" data-width="65px"> <option>3a</option> <option>3b</option> <option>3c</option> ' +
+    '<option>4a</option> <option>4b</option> <option>4c</option>  <option data-divider="true"></option><option>5a</option> <option>5a+</option> <option>5b</option> <option>5b+</option> <option>5c</option> ' +
+    '<option>5c+</option>  <option data-divider="true"></option> <option selected>6a</option> <option>6a+</option> <option>6b</option> <option>6b+</option> <option>6c</option> <option>6c+</option>  <option data-divider="true"></option> ' +
+    '<option>7a</option> <option>7a+</option> <option>7b</option> <option>7b+</option> <option>7c</option> <option>7c+</option>  <option data-divider="true"></option> <option>8a</option> <option>8a+</option> ' +
+    '<option>8b</option> <option>8b+</option> <option>8c</option> <option>8c+</option>  <option data-divider="true"></option> <option>9a</option> <option>9a+</option> <option>9b</option> <option>9b+</option> <option>projet</option> </select>' +        
+                    '<select name="rate" class="selectpicker" placeholder="Select rate" data-width="85px">' +
+                    '<option value="" selected> Note</option>' +
+   					'<option value="0" data-content="' + chainz + '" </option>' +
+                    '<option value="1" data-content="' + chainy + '"></option>' +
+                    '<option value="2" data-content="' + chainy + chainy + '" ></option>' +
+                    '<option value="3" data-content="' + chainy + chainy + chainy + '"></option>' +
+                    '</select>' + '<br>' +               
+                   'GPS process : <div class="progress"  id="gpssection"> Searching... </div> <button type="submit" id="submeat" class="btn btn-info" onClick="'+chainx+'"> Suivant </button> </form> </li>';
+                   
+                   gpsTriger();
+                   $('select').selectpicker();
+                   
+
+            }
+            
+            
+
+            
+            if((source === "newline")||(source === "changeline")||(source === "newsecteur")||(source === "plansecteur")||(source === "")){
+            	for(var k=0; k<json.Secteur[currentSecteur].Voie.length; k++){
+              		var chain = ' <li class="list-group-item">' + 
+              	 	myDecode(json.Secteur[currentSecteur].Voie[k].name)  + ' ' + json.Secteur[currentSecteur].Voie[k].grade + ' ' + json.Secteur[currentSecteur].Voie[k].rate + 
+              	 	'<element class="fonctions"> <button type="button" class="btn btn-default btn-xs" onclick="editLine(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-xs" onclick="deleteLine(' + k + ')" > <span class="glyphicon glyphicon-remove"></span></button></element> </li>';
+					element.innerHTML += chain;
+                 }
+	             element.innerHTML += '</ul>  <center> <button class="btn btn-info" onClick="addLine()">  <span class="glyphicon glyphicon-plus"></span> voie </button> </center>';
+            }
+            
+            element.innerHTML += '</ul>';
+            
+           } // fin STEP 2
+
+       }
+       
+       
+       function prefinish(x){
+       	alert(json.SiteSlug);
+       	alert(json.SiteSlug.length + "--" + json.SiteSlug +"--");
+       	if(x === "new"){ finish();}
+       	else{deleteSite(json.SiteSlug);}
+       }
+       
+       function finish() { //push site into db
+       	var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);
+        db.transaction(fillFavoris, errorCB, relocate);  
+        //relocate();
+       }
+       
+    function fillFavoris(tx) {
+         //save the site attributes
+         var query = 'INSERT INTO sites (name, slug, abstract, latitude, longitude, altitude, accuracy, linenb) VALUES ("' +
+              json.SiteName + '" , "' + 
+              json.SiteSlug + '" , "' + 
+              json.SiteAbstract + '" ,' + 
+              json.SiteGPS.Latitude + ',' + 
+              json.SiteGPS.Longitude + ',' + 
+              json.SiteGPS.Altitude + ',' + 
+              json.SiteGPS.Accuracy + ',' + 
+              json.linenb + ')';    
+         tx.executeSql(query);
+         alert("site enregistre");
+         
+         for(k=0;k<json.Secteur.length;k++){
+          var query1 = "INSERT INTO secteurs (name, slug, linenb, siteslug) VALUES ('" +
+              json.Secteur[k].name + "','"  + json.Secteur[k].slug + "',"  + json.Secteur[k].linenb + ",'" + json.SiteSlug + "')" ;    
+          alert(query1);
+          tx.executeSql(query1);
+         
+             for(l=0;l<json.Secteur[k].Voie.length;l++){
+             	alert("svaing line " + l);
+             	var query2 = "INSERT INTO lines (name, grade, rate, secteurslug, siteslug, latitude, longitude, altitude, accuracy) VALUES ('" +
+                 json.Secteur[k].Voie[l].name + "','" + 
+                 json.Secteur[k].Voie[l].grade + "','" +
+                 json.Secteur[k].Voie[l].rate + "','" +
+                 json.Secteur[k].slug + "','" +
+                 json.SiteSlug + "'," +
+                 json.Secteur[k].Voie[l].latitude + "," +
+                 json.Secteur[k].Voie[l].longitude + ",'" +
+                 json.Secteur[k].Voie[l].altitude + "'," +
+                 json.Secteur[k].Voie[l].accuracy + ")";
+                 alert(query2);    
+               tx.executeSql(query2);
+             }
+         
+         alert("secteur : " + json.Secteur[k].slug + " enregistre");
+         }
+    }
+       	  
+    function relocate(){
+    	window.location.href = "favoris.html";
+    	
+    }
+    function errorCB(tx, err) { alert("Error processing SQL: "+err);} 
+    function successCB() { alert('success!!!!');}
+     
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+   
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-select.css" rel="stylesheet">
+<link href="css/bonoway.css" rel="stylesheet">
+
+
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+
+<div class="panel panel-info">
+<div class="panel-heading" >
+    <h3 class="panel-title" id="headsection">Etape 0 : Le site.</h3>
+</div>
+
+<div class="panel-body">
+    <div id="tabulation"> </div>
+
+    <div id="container" class="container"></div> 
+
+</div>
+</div>
+
+<center id="finish">  </center>
+
+
+
+
+
+
+
+
+
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->     
+    
+        <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script> 
+    
+      <script src="phonegap.js"></script>
+  <script src="js/bootstrap-select.min.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+  <script type="text/javascript"> $('select').selectpicker(); </script> 
+    
+    
+  </body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+    
+  
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() { 
+       var element = document.getElementById('boutons');
+       element.innerHTML = '<button type="button" class="btn btn-danger" onClick="resetLines()" > Créer/vider la table "lines" </button> <br> <br> <button type="button" class="btn btn-danger" onClick="resetBoulders()"> Créer/vider la table "boulders" </button> <br> <br> <button type="button" class="btn btn-danger" onClick="resetCrags()"> Créer/vider la table "crags" </button>';
+       alert("Device is ready");
+    }   
+
+  
+  // Populate the database     
+    function createLines(tx) {
+         tx.executeSql('DROP TABLE IF EXISTS lines');
+         tx.executeSql('CREATE TABLE IF NOT EXISTS lines (nom varchar(255), site varchar(255), cote varchar(3), latitude, longitude, altitude, accuracy, CONSTRAINT lineid PRIMARY KEY (nom, site))');
+         alert("table 'lines' (re)créée vierge" );
+    }
+    
+    function createBoulders(tx) {
+         tx.executeSql('DROP TABLE IF EXISTS boulers');
+         tx.executeSql('CREATE TABLE IF NOT EXISTS boulders (nom varchar(255), site varchar(255), cote varchar(3), latitude, longitude, altitude, accuracy, CONSTRAINT boulderid PRIMARY KEY (nom, site))');
+         alert("la table 'boulders' (re)créée vierge" );
+    }
+    
+    function createCrags(tx) {
+         tx.executeSql('DROP TABLE IF EXISTS CRAGS');        
+         tx.executeSql('CREATE TABLE IF NOT EXISTS CRAGS (nom varchar(255), linenb, latitude, longitude, zoom, pays varchar(255), CONSTRAINT cragid PRIMARY KEY (nom, pays) )');
+         alert("la table 'crags' (re)créée vierge" );
+    }
+
+    // Transaction error callback
+    function onError(tx, err) {
+        alert("Error processing SQL: "+err);
+    }
+
+    // Transaction success callback
+    function onSuccess() {
+        alert("success!");
+    }
+
+
+     function resetLines() {         
+          var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);
+          db.transaction(createLines, onError, onSuccess);  
+          }
+          
+          
+     function resetBoulders() {  
+          var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000); 
+          db.transaction(createBoulders, onError, onSuccess);  
+          } 
+          
+          
+     function resetCrags() { 
+  
+          var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);       
+          db.transaction(createCrags, onError, onSuccess);  
+          } 
+    </script>
+
+
+
+    <!-- Le styles -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        color: #4E5053;          
+      }
+          
+.navbar navbar-inverse navbar-fixed-top{
+ 
+}
+    </style>
+    <link href="../css/bootstrap-responsive.css" rel="stylesheet">
+
+</head> 
+<body> 
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="index.html"> Bonoway Mango</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="addLine.html"> <i class="icon-plus icon-white"></i> Ajouter une ligne </a></li>
+              <li><a href="addCrag.html"> <i class="icon-plus icon-white"></i> Ajouter un site </a></li>
+              <li><a href="listLines.html"> <i class="icon-th-list icon-white"> </i> Voies </a></li>
+              <li><a href="listCrags.html"> <i class="icon-th-list icon-white"> </i> Sites </a></li>
+              <li><a href="mapLines.html"> <i class="icon-map-marker icon-white"> </i> Carte des voies </a></li>
+              <li><a href="mapCrags.html"> <i class="icon-map-marker icon-white"> </i> Carte des sites </a></li>
+              <li><a href="settings.html"> <i class="icon-wrench icon-white"> </i> Réglages </a></li>              
+              <li><a href="dev/testarea.html"> - Developpement- </a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="container">
+
+    <h3>Gestion de la base de donnée </h1>
+     
+   <div id="boutons">  
+     
+   <button type="button" id="erasev"class="btn btn-danger" onClick="resetLines()" disabled> Créer/vider la table "lines" </button>
+   <br> <br>
+   <button type="button" id="eraseb"class="btn btn-danger" onClick="resetBoulders()" disabled> Créer/vider la table "boulders" </button>  
+   <br> <br>
+   <button type="button" id="erases"class="btn btn-danger" onClick="resetCrags()" disabled> Créer/vider la table "crags" </button>  
+ 
+   </div>
+ 
+  </div>     <!-- /container -->
+
+
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+     
+    
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap-transition.js"></script>
+    <script src="../js/bootstrap-alert.js"></script>
+    <script src="../js/bootstrap-modal.js"></script>
+    <script src="../js/bootstrap-dropdown.js"></script>
+    <script src="../js/bootstrap-scrollspy.js"></script>
+    <script src="../js/bootstrap-tab.js"></script>
+    <script src="../js/bootstrap-tooltip.js"></script>
+    <script src="../js/bootstrap-popover.js"></script>
+    <script src="../js/bootstrap-button.js"></script>
+    <script src="../js/bootstrap-collapse.js"></script>
+    <script src="../js/bootstrap-carousel.js"></script>
+    <script src="../js/bootstrap-typeahead.js"></script>
+
+  </body>
+</html>

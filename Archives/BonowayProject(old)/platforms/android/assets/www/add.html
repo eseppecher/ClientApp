@@ -1,0 +1,512 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+   <!-- ========================= JAVASCRIPT ========================= --> 
+  <script src="cordova.js"></script>
+  <script src="js/xdb.js"></script>
+  <script src="js/xgps2.js"></script>
+  <script type="text/javascript" charset="utf-8">
+
+
+
+     
+     var addType = "";
+     var currentParking= -1;
+     var currentSecteur= -1;
+     var currentLine = -1;
+
+// Reuperation du json si mode=edition sinon initialisation des données     
+    var json = "";
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+    	var requete = window.location.search ; 
+    	if (requete) { requete = requete.substring(1) ; requete = unescape(requete) ; eval(requete);} 
+    	if(json === ""){
+    		json = {
+                "SiteName":  "",
+                "SiteSlug": "",
+                "SiteAbstract": "",
+                "linenb" : 0,
+                "SiteGPS": { "Latitude": 0, "Longitude": 0, "Altitude": 0, "Accuracy": 0},
+                "Parking" : [],
+                "Secteur" : []};
+            var chain = "prefinish('new')";
+            document.getElementById('finish').innerHTML = '<button class="btn btn-default" onClick="' + chain  +'"> Enregistrer et terminer. <span class="glyphicon glyphicon-ok"  ></span>  </button>';
+        	nextstep("",0,""); 
+    	}
+    	else{
+    		json = JSON.parse(json);
+           	var chain = "prefinish('edit')";
+            document.getElementById('finish').innerHTML = '<button class="btn btn-default" onClick="' + chain  +'"> Enregistrer et terminer. <span class="glyphicon glyphicon-ok"  ></span>  </button>';     		
+     		nextstep("",1,"favoris");
+    	}  
+    }
+    
+    function path() {  alert('La fonction "path" nest pas dévelopée'); }
+    
+   
+    function editParking(x){currentParking = x; nextstep('',1,'editparking'); }
+    function deleteParking(x){ json.Parking.splice(x,1); nextstep('',1,'favoris');}
+    
+    function editSecteur(x){currentSecteur = x; nextstep('',1,'editsecteur'); }
+    function deleteSecteur(x){json.linenb = json.linenb -json.Secteur[x].linenb; json.Secteur.splice(x,1); nextstep('',1,'favoris');}
+    function fillSecteur(x){currentSecteur = x; nextstep('',2,'editsecteur'); }
+
+
+    function addLine(){nextstep('',2,'addline'); }    
+    function editLine(x){currentLine = x; nextstep('',2,'editline'); }
+    function deleteLine(x){json.linenb = json.linenb - 1; json.Secteur[currentSecteur].linenb = json.Secteur[currentSecteur].linenb - 1; json.Secteur[currentSecteur].Voie.splice(x,1); nextstep('',2,''); }
+    
+    function sluger(x){ var y = x.replace(/[ |&;$%@"'<>()+,]/g, ""); return y;}
+    
+    
+    function nextstep(myform,step,source) {
+           
+           //STEP 0 (nom du site et abstract)
+           if(step === 0){
+           		var element = document.getElementById('container');
+           		var chain = "nextstep(myform,1,'site')";
+                element.innerHTML = '<form role="form"  name="myform" action="javascript:void(0);">'  +
+           	    	'<b>Nom du site</b> <div class="form-group">  <input type="text" class="form-control" name="name" value="' + myDecode(json.SiteName) + '" placeholder="..."> </div> <br>'+
+                    '<b>Description du site</b> <div class="form-group">   <textarea class="form-control" name="abstract" rows="3" placeholder="...">'+myDecode(json.SiteAbstract)+'</textarea> </div> <br>'+ 
+                   '<br> <button type="submit" id="submeat" class="btn btn-info" onclick="'+ chain +'"> Suivant </button>'+	
+                   '</form>';
+           }
+           
+           //STEP 1 (plan du site)
+           if(step === 1){
+           	gpsoff = true;
+           	elt = document.getElementById('headsection');
+           	elt.innerHTML = "Etape 1 : Plan du site.";
+           	//Coming from step 0 json addition SAVING SITE ATTRIBUTES
+           	if(source === "site" ){
+           		gpsoff=true;
+           		json.SiteName = myEncode(document.myform.name.value);
+           		json.SiteSlug = sluger(document.myform.name.value);
+            	json.SiteAbstract = myEncode(document.myform.abstract.value);
+
+            }
+            //coming from editing secteur json modif SAVING
+            if(source === "savesecteur" ){ json.Secteur[currentSecteur].name =  myEncode(document.myform.name.value); json.Secteur[currentSecteur].slug =  sluger(document.myform.name.value); }
+            
+            //coming from editing secteur json modif SAVING
+            if(source === "saveparking" ){ 
+            	gpsoff=true;//stop gps
+            	json.Parking[currentParking].latitude =CurrentLatitude; 
+            	json.Parking[currentParking].longitude =CurrentLongitude;
+            	json.Parking[currentParking].altitude =CurrentAltitude;
+            	json.Parking[currentParking].accuracy =CurrentAccuracy;  
+            	}
+            
+            if(source === "newparking" ){
+            	gpsoff=true;//stop gps 
+            	var obj = {"id": json.Parking.length, "latitude": CurrentLatitude, "longitude": CurrentLongitude, "altitude": CurrentAltitude, "accuracy": CurrentAccuracy, "siteslug": json.SiteSlug};
+     		    json.Parking.push(obj);
+            }
+            
+           	// displaying common part
+           	var element = document.getElementById('container');
+           	var chain = "nextstep('',0,'')";
+            element.innerHTML = '<h4>' + myDecode(json.SiteName) + '<button type="button" class="btn btn-default btn-rs" onclick="' + chain + '"> <span class="glyphicon glyphicon-pencil"  ></span></button></h4> <i>' +
+             myDecode(json.SiteAbstract) +'</i> ';
+           	 
+             
+           	//display standard
+           	if((source === "favoris")||(source === "lines")||(source === "site")||(source === "newparking")||(source === "saveparking")||(source === "editsecteur")){
+           		var chainlist = '<br><br><b> Parkings : </b> <br> <ul class="list-group">';
+           		for(var k=0; k<json.Parking.length; k++){
+              		chainlist = chainlist + ' <li class="list-group-item">' + 'Parking '  + k +
+              		'<element class="fonctions"> <button type="button" class="btn btn-default btn-rs" onclick="editParking(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-rs" onclick="deleteParking('+k+')" > <span class="glyphicon glyphicon-remove"></span></button></element></li>';
+            	}
+
+           		chainlist = chainlist + '</ul> <center> <button class="btn btn-info" onClick="editParking(' + json.Parking.length + ')">  <span class="glyphicon glyphicon-plus"></span> parking </button> </center>';
+           		element.innerHTML += chainlist;
+           	}
+
+       		
+       		if(source === "editparking"){
+       			var chainlist = '<br><br><b> Parkings : </b> <br> <ul class="list-group">';
+           		for(var k=0; k<currentParking; k++){ chainlist = chainlist + ' <li class="list-group-item"> Parking ' + k  + '</li> ';}
+           		
+                if(currentParking===json.Parking.length){var chain = "nextstep('',1,'newparking')";}
+                else{var chain = "nextstep(myform,1,'saveparking')";}
+            	chainlist = chainlist + '<li class="list-group-item"> Praking ' + currentParking +  ' </div> <br>' +
+                       'GPS process : <div class="progress"  id="gpssection"> Searching... </div> '+
+                       '<center> <button type="submit" id="submeat" class="btn btn-info" onClick="'+chain+'"> Suivant </button></center>' + '</li>';
+            	gpsTriger();
+            	
+            	for(var k=currentParking+1; k<json.Parking.length; k++){ chainlist = chainlist + ' <li class="list-group-item"> Parking ' + k  + '</li> ';}
+            	
+           		chainlist = chainlist +  '</ul>';
+           		element.innerHTML += chainlist;
+           	}
+           	
+           	if((source === "favoris")||(source === "lines")||(source === "site")||(source === "newparking")||(source === "saveparking")||(source === "editparking")){
+           		var chainlist = '<br><br><b> Secteurs : </b> <br> <ul class="list-group">';
+           		for(var k=0; k<json.Secteur.length; k++){
+              		chainlist = chainlist + ' <li class="list-group-item"><a onclick="fillSecteur(' + k + ')">' + 
+              		myDecode(json.Secteur[k].name)  +
+              		'</a><element class="fonctions"> <button type="button" class="btn btn-default btn-rs" onclick="editSecteur(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-rs" onclick="deleteSecteur('+k+')" > <span class="glyphicon glyphicon-remove"></span></button></element></li>';
+            	}
+            	
+            	           		chainlist = chainlist + '</ul> <center> <button class="btn btn-info" onClick="editSecteur(' + json.Secteur.length + ')">  <span class="glyphicon glyphicon-plus"></span> secteur </button> </center>';
+           		element.innerHTML += chainlist;
+           	}
+           	
+       		
+           	if(source === "editsecteur"){
+           		var chainlist = '<br><br><b> Secteurs : </b> <br> <ul class="list-group">';
+           		for(var k=0; k<currentSecteur; k++){ chainlist = chainlist + ' <li class="list-group-item">' + myDecode(json.Secteur[k].name)  + '</li> ';}
+           		
+            	if(currentSecteur === json.Secteur.length){
+            		var chain = "nextstep(myform,2,'newsecteur')", valeur = "";
+        		}
+            	else{ 
+            		var chain = "nextstep(myform,1,'savesecteur')", valeur = myDecode(json.Secteur[currentSecteur].name);
+        		}
+        		if(json.Secteur[currentSecteur] !== undefined){
+        			 var valeurx=myDecode(json.Secteur[currentSecteur].name);
+        			}
+    			else{
+        			 var valeurx= "";
+				}
+            	chainlist = chainlist + '<li class="list-group-item"> <form role="form" name="myform" action="javascript:void(0);">' +
+                       '<b>Nom du secteur </b> <div class="form-group">  <input type="text" class="form-control" name="name" placeholder="Nom du secteur" value="' + valeurx + '" > </div>' + ' </div> <br>' +
+                       '</div> <center> <button type="submit" id="submeat" class="btn btn-info" onClick="'+chain+'"> Suivant </button></center>' + '</form> </li>';
+            	
+            	for(var k=currentSecteur+1; k<json.Secteur.length; k++){ chainlist = chainlist + ' <li class="list-group-item">' + myDecode(json.Secteur[k].name)  + '</li> ';}
+            	
+           		chainlist = chainlist +  '</ul>';
+           		element.innerHTML += chainlist;
+           	}
+           	
+         }
+           
+           
+           
+           //STEP 2 LINES
+           if(step === 2){
+           var elt = document.getElementById('headsection');
+           elt.innerHTML = "Etape 2 : les voies";
+           
+           //Saving new secteur if colming from new secteur
+            if(source === "newsecteur"){
+            	var obj = { "name": myEncode(document.myform.name.value),"slug": sluger(document.myform.name.value), "linenb":0, "Voie" : []};
+     		    json.Secteur.push(obj);
+            }
+           //Saving new line
+            if(source === "newline"){
+            	gpsoff=true;//stop gps
+             	var obj = { "name": myEncode(document.myform.name.value), "abstract": myEncode(document.myform.abstract.value), "grade": document.myform.grade.value, "rate": document.myform.rate.value, 
+             	"latitude": CurrentLatitude, "longitude": CurrentLongitude, "altitude": CurrentAltitude, "accuracy": CurrentAccuracy };
+             	json.Secteur[currentSecteur].Voie.push(obj);
+             	json.linenb = json.linenb + 1; json.Secteur[currentSecteur].linenb = json.Secteur[currentSecteur].linenb + 1;
+            }
+            //Saving edited line
+            if(source === "changeline"){
+            	gpsoff=true;//stop gps
+            	json.Secteur[currentSecteur].Voie[currentLine].name = myEncode(document.myform.name.value);
+                json.Secteur[currentSecteur].Voie[currentLine].grade = document.myform.grade.value;
+                json.Secteur[currentSecteur].Voie[currentLine].rate = document.myform.rate.value;
+            }
+           
+            
+            // displaying common part
+            var element = document.getElementById('container');
+            var charchain = "nextstep('',1,'lines')";
+            element.innerHTML = '<center> <button class="btn btn-default" onClick="' + charchain + '"> Plan des secteurs. </button> </center>' +
+            					"<h4> Secteur : " + myDecode(json.Secteur[currentSecteur].name) + "</h4>";
+            		 
+            
+            element.innerHTML += '<ul class="list-group">';
+            
+             //displaying specific
+             ////////////////////////////ADD LINE display
+            if(source === "addline"){ //adding lines
+              	for(var k=0; k<json.Secteur[currentSecteur].Voie.length; k++){
+              		var chain = ' <li class="list-group-item">' + 
+              	 	myDecode(json.Secteur[currentSecteur].Voie[k].name)  + ' ' + fgradeDecode(json.Secteur[currentSecteur].Voie[k].grade) + ' ' + rateDecode(json.Secteur[currentSecteur].Voie[k].rate) + 
+              	 	'<element class="fonctions"> <button type="button" class="btn btn-default btn-rs" onclick="editLine(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-rs" onclick="deleteLine(' + k + ')" > <span class="glyphicon glyphicon-remove"></span></button></element> </li>';
+					element.innerHTML += chain;
+              	}
+            	
+            	var chainx = "nextstep(myform,2,'newline')";
+            	var chainy = "<span class='glyphicon glyphicon-star'></span>";
+            	var chainz = "<span class='glyphicon glyphicon-thumbs-down'></span>";
+            	var valeurName = "";
+            	var valeurGrade = "6a";
+            	var valeurRate = "";   
+  
+            	element.innerHTML += '<li class="list-group-item"> <form role="form" name="myform" action="javascript:void(0);"> <div class="form-group">' +  
+            	    '<input type="text" class="form-control" name="name" placeholder="Nom de la voie" value="' + valeurName + '"> </div>' + 
+                    
+                    '<select name="grade" class="selectpicker show-tick" data-width="80px" title="Note"> <option value="1">3a</option> <option value="3">3b</option> <option value="5">3c</option> ' +
+    				'<option value="7">4a</option> <option value="9">4b</option> <option value="11">4c</option>  <option data-divider="true"></option>' +
+    				'<option value="13">5a</option> <option value="14">5a+</option> <option value="15">5b</option> <option value="16">5b+</option> <option value="17">5c</option> <option value="18">5c+</option>  <option data-divider="true"></option>'+
+    				'<option selected value="19">6a</option> <option value="20">6a+</option> <option value="21">6b</option> <option value="22">6b+</option> <option value="23">6c</option> <option value="24">6c+</option> <option data-divider="true"></option>'+
+    				'<option value="25">7a</option> <option value="26">7a+</option> <option value="27">7b</option> <option value="28">7b+</option> <option value="29">7c</option> <option value="30">7c+</option>  <option data-divider="true"></option>'+
+    				'<option value="31">8a</option> <option value="32">8a+</option> <option value="33">8b</option> <option value="34">8b+</option> <option value="35">8c</option> <option value="36">8c+</option>  <option data-divider="true"></option>'+
+    				'<option value="37">9a</option> <option value="38">9a+</option> <option value="39">9b</option> <option value="40">9b+</option> <option value="0">projet</option> </select>' +
+                   
+                    '<select name="rate" class="selectpicker" data-width="105px" >' +
+                    '<option value="-1" >Sans note</option>' +
+   					'<option value="0" data-content="' + chainz + '"></option>' +
+                    '<option value="1" data-content="' + chainy + '"></option>' +
+                    '<option value="2" data-content="' + chainy + chainy + '" ></option>' +
+                    '<option value="3" data-content="' + chainy + chainy + chainy + '"></option>' +
+                    '</select>' + '<br>' +  
+                    '<div class="form-group">   <textarea class="form-control" name="abstract" rows="3" placeholder="Description"></textarea> </div>'+                                           
+                   'GPS process : <div class="progress"  id="gpssection"> Searching... </div> <center> <button type="submit" id="submeat" class="btn btn-info" onClick="'+chainx+'"> Suivant </button> </center></form> </li> </ul>';
+                   
+                   gpsTriger();
+                   
+                   
+
+            }
+            
+            
+            ////////////////////////////EDIT LINE display
+             if(source === "editline"){
+             	    for(var k=0; k<currentLine; k++){
+              		var chain = ' <li class="list-group-item">' + 
+              	 	myDecode(json.Secteur[currentSecteur].Voie[k].name)  + ' ' + fgradeDecode(json.Secteur[currentSecteur].Voie[k].grade) + ' ' + rateDecode(json.Secteur[currentSecteur].Voie[k].rate) + 
+              	 	'<element class="fonctions"> <button type="button" class="btn btn-default btn-rs" onclick="editLine(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-rs" onclick="deleteLine(' + k + ')" > <span class="glyphicon glyphicon-remove"></span></button></element> </li>';
+					element.innerHTML += chain;
+              }
+            	
+            	var chainx = "nextstep(myform,2,'changeline')";
+            	var chainy = "<span class='glyphicon glyphicon-star'></span>";
+            	var chainz = "<span class='glyphicon glyphicon-thumbs-down'></span>";
+            	var valeurName = myDecode(json.Secteur[currentSecteur].Voie[currentLine].name);
+            	var valeurGrade = json.Secteur[currentSecteur].Voie[currentLine].grade;
+                var valeurRate = json.Secteur[currentSecteur].Voie[currentLine].rate;
+                var valeurAbstract = myDecode(json.Secteur[currentSecteur].Voie[currentLine].abstract);
+
+            	
+
+            	element.innerHTML += '<li class="list-group-item"> <form role="form" name="myform" action="javascript:void(0);"> <div class="form-group">' +  
+            	    '<input type="text" class="form-control" name="name" placeholder="Nom de la voie" value="' + valeurName + '"> </div>' + 
+                    
+                    '<select name="grade" class="selectpicker show-tick" data-width="80px" title="Note"> <option value="1">3a</option> <option value="3">3b</option> <option value="5">3c</option> ' +
+    				'<option value="7">4a</option> <option value="9">4b</option> <option value="11">4c</option>  <option data-divider="true"></option>' +
+    				'<option value="13">5a</option> <option value="14">5a+</option> <option value="15">5b</option> <option value="16">5b+</option> <option value="17">5c</option> <option value="18">5c+</option>  <option data-divider="true"></option>'+
+    				'<option selected value="19">6a</option> <option value="20">6a+</option> <option value="21">6b</option> <option value="22">6b+</option> <option value="23">6c</option> <option value="24">6c+</option> <option data-divider="true"></option>'+
+    				'<option value="25">7a</option> <option value="26">7a+</option> <option value="27">7b</option> <option value="28">7b+</option> <option value="29">7c</option> <option value="30">7c+</option>  <option data-divider="true"></option>'+
+    				'<option value="31">8a</option> <option value="32">8a+</option> <option value="33">8b</option> <option value="34">8b+</option> <option value="35">8c</option> <option value="36">8c+</option>  <option data-divider="true"></option>'+
+    				'<option value="37">9a</option> <option value="38">9a+</option> <option value="39">9b</option> <option value="40">9b+</option> <option value="0">projet</option> </select>' +
+                   
+                    '<select name="rate" class="selectpicker" placeholder="Select rate" data-width="105px">' +
+                    '<option value="-1">Sans note</option>' +
+   					'<option value="0" data-content="' + chainz + '"></option>' +
+                    '<option value="1" data-content="' + chainy + '"></option>' +
+                    '<option value="2" data-content="' + chainy + chainy + '" ></option>' +
+                    '<option value="3" data-content="' + chainy + chainy + chainy + '"></option>' +
+                    '</select>' + '<br>' +     
+                    '<div class="form-group">   <textarea class="form-control" name="abstract" rows="3" placeholder="Description">'+valeurAbstract+'</textarea> </div>'+          
+                   'GPS process : <div class="progress"  id="gpssection"> Searching... </div> <center> <button type="submit" id="submeat" class="btn btn-info" onClick="'+chainx+'"> Suivant </button> </center></form> </li>';
+                   
+                   gpsTriger();
+
+                   
+                   for(var k=currentLine+1; k<json.Secteur[currentSecteur].Voie.length; k++){
+              		var chain = ' <li class="list-group-item">' + 
+              	 	myDecode(json.Secteur[currentSecteur].Voie[k].name)  + ' ' + fgradeDecode(json.Secteur[currentSecteur].Voie[k].grade) + ' ' + json.Secteur[currentSecteur].Voie[k].rate + 
+              	 	'<element class="fonctions"> <button type="button" class="btn btn-default btn-rs" onclick="editLine(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-rs" onclick="deleteLine(' + k + ')" > <span class="glyphicon glyphicon-remove"></span></button></element> </li>';
+					element.innerHTML += chain;
+                   }
+             }
+            
+            if((source === "newline")||(source === "changeline")||(source === "newsecteur")||(source === "editsecteur")||(source === "")){
+            	for(var k=0; k<json.Secteur[currentSecteur].Voie.length; k++){
+              		var chain = ' <li class="list-group-item">' + 
+              	 	myDecode(json.Secteur[currentSecteur].Voie[k].name)  + ' ' + fgradeDecode(json.Secteur[currentSecteur].Voie[k].grade) + ' ' + rateDecode(json.Secteur[currentSecteur].Voie[k].rate) + 
+              	 	'<element class="fonctions"> <button type="button" class="btn btn-default btn-rs" onclick="editLine(' + k + ')"> <span class="glyphicon glyphicon-pencil"  ></span></button> ' +
+                    '<button type="button" class="btn btn-default btn-rs" onclick="deleteLine(' + k + ')" > <span class="glyphicon glyphicon-remove"></span></button></element> </li>';
+					element.innerHTML += chain;
+                 }
+	             element.innerHTML += '</ul>  <center> <button class="btn btn-info" onClick="addLine()">  <span class="glyphicon glyphicon-plus"></span> voie </button> </center>';
+            }
+    
+            element.innerHTML += '</ul>';
+            
+             //creating dropdown select element and setting default values.
+             $('select').selectpicker();
+             $('select[name=grade]').val(valeurGrade);
+             $('select[name=rate]').val(valeurRate);
+             $('.selectpicker').selectpicker('render');
+            
+           } // fin STEP 2
+       }
+
+       
+       
+       function prefinish(x){
+       	if(x === "new"){ finish();}
+       	else{deleteSite(json.SiteSlug);}
+       }
+       
+       function finish() { //push site into db
+       	var db = window.openDatabase("bonowayDB", "1.0", "Bonoway Local Database", 1000000);
+        db.transaction(fillFavoris, errorCB, relocate);  
+       }
+       
+    function fillFavoris(tx) {
+    	
+    	var siteLat=0, siteLong=0, siteAlt=0, totalLat=0,totalLong=0, totalAlt=0, totalAcc=0;
+    	var secLat=0, secLong=0, secAlt=0, secAcc=0, secLatSum=0, secLongSum=0, secAltSum=0, secAccSum=0;
+    	var siteHisto=[["3",0],["4",0],["5",0],["6",0],["7",0],["8",0],["9",0]], secteurHisto=[["3",0],["4",0],["5",0],["6",0],["7",0],["8",0],["9",0]];
+    	
+         for(k=0;k<json.Secteur.length;k++){ //Sauvegarde des secteurs et des voies
+         	 secLat=0; secLong=0; secAlt=0; secAcc=0; secLatSum=0; secLongSum=0; secAltSum=0; secAccSum=0;  
+         	 secteurHisto=[["3",0],["4",0],["5",0],["6",0],["7",0],["8",0],["9",0]];
+         	      
+             for(l=0;l<json.Secteur[k].Voie.length;l++){
+             	var query3 = "INSERT INTO lines (name, abstract, grade, rate, secteurslug, siteslug, latitude, longitude, altitude, accuracy) VALUES ('" +
+                 json.Secteur[k].Voie[l].name + "','" +
+                 json.Secteur[k].Voie[l].abstract + "','" + 
+                 json.Secteur[k].Voie[l].grade + "'," +
+                 json.Secteur[k].Voie[l].rate + ",'" +
+                 json.Secteur[k].slug + "','" +
+                 json.SiteSlug + "'," +
+                 json.Secteur[k].Voie[l].latitude + "," +
+                 json.Secteur[k].Voie[l].longitude + "," +
+                 json.Secteur[k].Voie[l].altitude + "," +
+                 json.Secteur[k].Voie[l].accuracy + ")";
+
+                 tx.executeSql(query3);
+                 
+                 if(json.Secteur[k].Voie[l].grade<7){siteHisto[0][1]=siteHisto[0][1]+1; secteurHisto[0][1]=secteurHisto[0][1]+1;}else{if(json.Secteur[k].Voie[l].grade<13){siteHisto[1][1]=siteHisto[1][1]+1; secteurHisto[1][1]=secteurHisto[1][1]+1;}
+                 else{if(json.Secteur[k].Voie[l].grade<19){siteHisto[2][1]=siteHisto[2][1]+1; secteurHisto[2][1]=secteurHisto[2][1]+1;}else{if(json.Secteur[k].Voie[l].grade<25){siteHisto[3][1]=siteHisto[3][1]+1; secteurHisto[3][1]=secteurHisto[3][1]+1;}
+                 else{if(json.Secteur[k].Voie[l].grade<31){siteHisto[4][1]=siteHisto[4][1]+1; secteurHisto[4][1]=secteurHisto[4][1]+1;}else{if(json.Secteur[k].Voie[l].grade<37){siteHisto[5][1]=siteHisto[5][1]+1; secteurHisto[5][1]=secteurHisto[5][1]+1;}
+                 else{if(json.Secteur[k].Voie[l].grade<50){siteHisto[6][1]=siteHisto[6][1]+1; secteurHisto[6][1]=secteurHisto[6][1]+1;}}}}}}}
+                 
+                 
+                 secLatSum = secLatSum + json.Secteur[k].Voie[l].accuracy*json.Secteur[k].Voie[l].latitude; secLongSum = secLongSum + json.Secteur[k].Voie[l].accuracy*json.Secteur[k].Voie[l].longitude;
+                 secAltSum= secAltSum+ json.Secteur[k].Voie[l].accuracy*json.Secteur[k].Voie[l].altitude; secAccSum = secAccSum + json.Secteur[k].Voie[l].accuracy;
+             }
+             
+             if(secAccSum!==0){
+             	secLat=secLatSum/secAccSum; secLat= secLat.toFixed(10); 
+             	totalLat=totalLat+secLat*secAccSum/json.Secteur[k].Voie.length; 
+             	secLong=secLongSum/secAccSum; secLong=secLong.toFixed(10); 
+             	totalLong=totalLong+secLong*secAccSum/json.Secteur[k].Voie.length;
+             	secAlt=secAltSum/secAccSum; secAlt=secAlt.toFixed(10); 
+             	totalAlt=totalAlt+secAlt*secAccSum/json.Secteur[k].Voie.length;
+             	totalAcc=totalAcc+secAccSum/json.Secteur[k].Voie.length;
+             }
+
+             var query2 = "INSERT INTO secteurs (name, slug, latitude, longitude, linenb, histo, siteslug) VALUES ('" +
+             json.Secteur[k].name + "','"  + json.Secteur[k].slug + "'," +  secLat + "," +  secLong + "," + json.Secteur[k].linenb + ",'" + myEncode(secteurHisto) + "','" + json.SiteSlug + "')" ;    
+
+          	 tx.executeSql(query2);
+         } 
+         
+         //save parkings
+
+        for(j=0;j<json.Parking.length;j++){
+          var query1 = "INSERT INTO parkings (id, latitude, longitude, altitude, accuracy, siteslug) VALUES (" +
+              json.Parking[j].id + ","  + json.Parking[j].latitude + ","  + json.Parking[j].longitude +
+               ","  + json.Parking[j].altitude +  ","  + json.Parking[j].accuracy + ",'" + json.SiteSlug + "')" ;
+   
+          tx.executeSql(query1);
+          
+          
+          totalLat = totalLat + json.Parking[j].latitude*json.Parking[j].accuracy; totalLong = totalLong + json.Parking[j].longitude*json.Parking[j].accuracy;
+          totalAlt = totalAlt + json.Parking[j].altitude*json.Parking[j].accuracy;
+          totalAcc = totalAcc + json.Parking[j].accuracy;
+          
+         }
+         
+         if(totalAcc!==0){
+        siteLat = totalLat/totalAcc;
+        siteLong = totalLong/totalAcc;
+        siteAlt = totalAlt/totalAcc;
+         }
+         
+         //save site
+
+         var query = 'INSERT INTO sites (name, slug, abstract, latitude, longitude, altitude, linenb, histo) VALUES ("' +
+              json.SiteName + '" , "' + 
+              json.SiteSlug + '" , "' + 
+              json.SiteAbstract + '" ,' + 
+              siteLat.toFixed(10) + ',' + 
+              siteLong.toFixed(10) + ',' + 
+              siteAlt.toFixed(10) + ',' + 
+              json.linenb + ',"' +
+              myEncode(siteHisto) + '")'; 
+
+         tx.executeSql(query);
+
+
+
+
+
+    }
+       	  
+    function relocate(){
+    	window.location.href = "favoris.html";
+    	
+    }
+    function errorCB(tx, err) { alert("Error processing SQL: "+err);} 
+    function successCB() { alert('success!!!!');}
+     
+    </script>
+
+
+   <!-- ========================= STYLE ========================= -->
+   
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-select.css" rel="stylesheet">
+<link href="css/bonoway.css" rel="stylesheet">
+
+
+
+
+   <!-- ========================= HTML ========================= -->
+   
+</head> 
+<body> 
+
+<div class="panel panel-info">
+<div class="panel-heading" >
+    <h3 class="panel-title" id="headsection">Etape 0 : Le site.</h3>
+</div>
+
+<div class="panel-body">
+    <div id="tabulation"> </div>
+
+    <div id="container" class="container"></div> 
+
+</div>
+</div>
+
+<center id="finish">  </center>
+
+
+
+   <!-- ========================= JAVASCRIPT ========================= -->     
+    
+  <script src="js/jquery.js"></script>
+  <script src="js/bootstrap-collapse.js"></script>    
+  
+  <script src="js/bootstrap-select.min.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+  <script type="text/javascript"> $('select').selectpicker(); </script> 
+    
+    
+  </body>
+</html>

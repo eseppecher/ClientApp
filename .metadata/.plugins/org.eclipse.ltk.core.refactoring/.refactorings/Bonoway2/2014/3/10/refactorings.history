@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Bonoway2/assets/www/favorisSite.html&apos; to &apos;display.html&apos;" description="Rename resource &apos;favorisSite.html&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="assets/www/favorisSite.html" name="display.html" stamp="1393976455820" updateReferences="true"/>
+</session>

@@ -1,0 +1,18 @@
+
+<div class="secondarybart">
+    <a  href ng-click="backSector(line.site,line.sector)"  class="back"> <i class="fa fa-chevron-left"></i> </a>
+       <h3> <div class="line-title" padding-left="15%" ng-bind-html="line.name"> </div>
+        <div class="line-title" ng-bind-html="line.grade"> </div>
+        <div class="line-title" ng-bind-html="line.rate | makeRate"> </div>
+        <div class="line-title"> <small> #tag1 #rag2 </small></div>
+    </h3>
+</div>
+
+<img ng-swipe-right="previous(line.id)"; ng-swipe-left="next(line.id)"; alt="" width="100%" height="auto" ng-src="datas/img/{{line.image}}">
+
+
+<div class="container">
+    <h4> {{line.description}} </h4>
+</div>
+
+<br> <br>

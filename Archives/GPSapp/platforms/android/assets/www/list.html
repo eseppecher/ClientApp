@@ -1,0 +1,127 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="phonegap.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+        // When device ready open,create database
+        var db = window.openDatabase("GPSdata", "1.0", "GPS Database", 1000000);
+         
+        var query = "SELECT * FROM markers"; 
+        
+        db.transaction(function (tx){ tx.executeSql( query, [], dispEntries, errorCB )});
+        
+    }
+
+
+    function dispEntries(tx, results){
+         var len = results.rows.length;
+         superchain = "";
+         var element = document.getElementById('listing');
+         for (i = 0; i < len; i++){
+               superchain = '<tr> <td>'+ results.rows.item(i).id +
+                  ' </td> <td> ' + results.rows.item(i).latitude +
+                  ' </td> <td> ' + results.rows.item(i).longitude + 
+                  ' </td> <td> ' + results.rows.item(i).accuracy + 
+                  ' </td> <td> ' + results.rows.item(i).altitude + 
+                  ' </td> <td> ' + results.rows.item(i).runtime  + ' </td> </tr>';
+               element.innerHTML += superchain;
+         }
+    }
+
+
+    // Transaction error callback
+    function errorCB(tx, err) {
+        alert("Error processing SQL: "+err);
+    }
+
+   function display(x,y){
+        var requete= "nom='" + x + "'; " + "site='" + y + "';"  ;  
+        requete = escape(requete);
+        window.location.href = "disLine.html?" + requete ;  
+   }
+     
+    </script>
+
+
+
+    <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        color: #4E5053;     
+        
+      }
+      
+      .navbar navbar-inverse navbar-fixed-top{ }
+</style>
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="index.html"> Bonoway Mango</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+<li><a href="addLine.html"> <i class="icon-plus icon-white"></i> Ajouter une ligne </a></li>
+              <li><a href="addCrag.html"> <i class="icon-plus icon-white"></i> Ajouter un site </a></li>
+              <li><a href="listLines.html"> <i class="icon-th-list icon-white"> </i> Voies </a></li>
+              <li><a href="listCrags.html"> <i class="icon-th-list icon-white"> </i> Sites </a></li>
+              <li><a href="mapLines.html"> <i class="icon-map-marker icon-white"> </i> Carte des voies </a></li>
+              <li><a href="mapCrags.html"> <i class="icon-map-marker icon-white"> </i> Carte des sites </a></li>
+              <li><a href="settings.html"> <i class="icon-wrench icon-white"> </i> Réglages </a></li>              
+              <li><a href="dev/testarea.html"> - Developpement- </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="container">
+
+      <h4>Table "lines" </h4>
+      
+    
+    <table class="table table-hover" id="listing"> 
+         <tr>  <td> ID </td> <td> Latitude </td> <td> Longitude </td> <td> Accuracy </td> <td> Altitude </td> <td> Runtimes </td> </tr>
+    </table>
+    
+    
+  </div>
+ 
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+
+  </body>
+</html>

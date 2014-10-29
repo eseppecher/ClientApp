@@ -1,0 +1,150 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="cordova.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&sensor=false"></script>
+    <script type="text/javascript" charset="utf-8">
+
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+   
+   
+      jSite = "";
+      var requete = window.location.search ; 
+      if (requete) {
+             requete = requete.substring(1) ; 
+             requete = unescape(requete) ; 
+             eval(requete); } 
+       
+       jsonSite = JSON.parse(jSite);     
+       
+       
+//Building site description       
+       
+       var division = document.getElementById('description');
+       division.innerHTML = '<ol class="breadcrumb"> <li><a href="receiveSites.html">Sites</a></li> <li class="active">' + jsonSite.name + '</li></ol>';     
+       division.innerHTML += "<h6>" + jsonSite.abstract + "</h6>" ;
+       
+       //PARKING!!!!!!    
+       var ajaxRequest = new XMLHttpRequest();          
+          ajaxRequest.onreadystatechange = function () {
+          
+              if(ajaxRequest.readyState==4 && ajaxRequest.status==200){
+
+                     var jsonR = JSON.parse(ajaxRequest.responseText); //Traduction de la réponse en JSON
+                     var element = document.getElementById('parking');
+                     element.innerHTML = ' <h4> Parkings </h4> <table class="table table-hover" id="listing">' + 
+                     '<tr><td> Nom </td> <td> Latitude </td> <td> Longitude </td> </tr> </table>';
+                     
+                     element = document.getElementById('listing');
+                     
+                     for (i = 0; i < jsonR.length; i++){
+                          superchain = '<tr onclick="letsgo()"> <td>' + 
+                          jsonR[i].name + 
+                          '</td> <td>' + jsonR[i].latitude +
+                          '</td> <td>' + jsonR[i].longitude + 
+                          '</td></tr> ' ;
+                          element.innerHTML += superchain;
+                     };       
+                     showMap(jsonR);            
+               }
+         }	
+           
+          
+    var queryString = "http://sleepy-shore-2585.herokuapp.com/api/site/" + jsonSite.slug + "/parkings"  ;
+    ajaxRequest.open("GET", queryString, false, "etienne", "makalu" );
+    ajaxRequest.send(null);
+    
+        
+    } // fin de onDeviceReady
+
+
+    function letsgo() {
+       alert("La fonction letsgo nest pas encore développée.");  
+    }
+     
+     
+    function showMap(jsonR) {
+    	var mapOptions = {
+               zoom: 11,
+               center: new google.maps.LatLng(jsonSite.latitude,jsonSite.longitude),
+               mapTypeId: google.maps.MapTypeId.SATELLITE
+        };
+
+     var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+	for (i = 0; i < jsonR.length; i++){
+	alert(i);
+     var contentString = '<div id="content">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h4 id="firstHeading" class="firstHeading">' + jsonR[i].name +
+      '</h4> </div>';
+    		alert(contentString);
+	var infowindow = new google.maps.InfoWindow({
+        content: contentString
+	  });
+
+    
+    var marker = new google.maps.Marker({
+		position:  new google.maps.LatLng(jsonR[i].latitude, jsonR[i].longitude),
+		map: map,
+        title: "test"
+    });
+        
+    google.maps.event.addListener(marker, 'click', function() {
+           infowindow.open(map,marker);
+    });
+    }; 
+    
+    } 
+     
+    </script>
+
+
+
+    <!-- ========================= STYLE ========================= -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<style>
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0 }
+  #map-canvas { height: 60% }
+
+</style>
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+
+   <!-- ========================= HTML ========================= -->
+
+</head> 
+<body> 
+
+	<div id="navigation"> </div>
+    <div class="container" >
+
+    	<div id="description"> </div>
+		<div id="parking"> </div>
+    
+  </div> <!-- Container -->  
+  
+  <div id="map-canvas" class="map-canvas"></div>
+ 
+   <!-- ========================= JAVASCRIPT ========================= -->    
+    
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+	<script src="js/navigation.js"></script>
+	
+  </body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /><title>Hello World</title>
+
+<!-- ========================= STYLE ========================= -->          
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="css/minerale.css" />
+  
+<style>
+  .container{
+   	width:100%;
+   	text-align: center; 
+   	padding-bottom: 10%;
+  }
+</style>
+
+</head>
+    <body>
+      		
+  <!-- ========================= HTML ========================= -->   		
+      		
+  <div id="switch">
+	  <div class="btn-group"> <button type="button" class="btn btn-info btn-lh" onclick="window.location.href = 'index.html';">METEO</button>
+  	  <button type="button" class="btn btn-info btn-lh active" onclick="window.location.href = 'add.html';"> ICI <span class="glyphicon glyphicon-map-marker"></span> </button> </div>
+  </div>
+      		
+  <div class="container">  
+    <form role="form"  name="myform" action="javascript:void(0);">
+      
+      <h3>Laches un commentaire</h3> 
+ 	  <div class="form-group">   <textarea class="form-control" tyle="width: 100px;" name="message" rows="3" placeholder="..."></textarea> </div> 
+		
+      <h3>Ca colle ou ca pouif?</h3>
+      <label class="fb" for="sunny">
+      	<input  type="radio" name="weather" id="sunny" required value="sunny"  />
+      	<img src="img/grimpeur.png" height="100">
+      </label>
+  	  <label class="fb" for="cloudy">
+        <input type="radio" name="weather" id="cloudy" value="cloudy"/>
+        <img src="img/umbrel.png" height="100">
+      </label>
+         
+  	  <h3> Localisation </h3> <div class="progress"  id="gpssection"> Recherche... </div>
+                   
+      <button type="submit" id="submeat" class="btn btn-condi btn-lg" onclick="retreive()"> Envoyer </button>	
+    </form>
+  </div>
+
+
+
+  <!-- ========================= JAVASCRIPT ========================= -->
+  		
+<script type="text/javascript" src="cordova.js"></script>
+<script src="js/ygps2.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+  
+  document.addEventListener("deviceready", onDeviceReady, false);
+  var name;
+    
+  function onDeviceReady() {
+	 gpsTriger();
+	 var db = window.openDatabase("condiDB", "1.0", "CondiDB", 1000000);
+	 var query = "SELECT * FROM config" ;
+     db.transaction(function (tz){ tz.executeSql(query, [], retreiveName, onError )});        
+  }
+  
+  function retreiveName(tx, results) { name = results.rows.item(0).name;}
+    
+  function retreive() {
+  	 if((!myform.weather[0].checked)&&(!myform.weather[1].checked)){
+  	 	alert("Clique sur bonne ou mavaise condition");
+  	 }
+  	 else{
+	  	 if(CurrentAccuracy >= 100){
+	  	 	alert("Le GPS n'a pas encore trouve ta position.");
+	  	 }
+	  	 else{
+	  	 	alert("BIEN REMPLI!");
+		     gpsoff=true;//stop gps
+		     var weather ="";
+		     if(myform.weather[0].checked){weather = "sunny";}
+		     if(myform.weather[1].checked){weather = "cloudy";}
+		     var queryChain = '{"name" : "' + name + '", "message" : "' + document.myform.message.value + '", "weather": "' + weather +
+		    	 '", "location":{"latitude": ' + CurrentLatitude + ', "longitude":' + CurrentLongitude + '}}';
+		     send(queryChain);
+	    }
+    }
+  } 
+        
+        
+  function send(queryChain) {      	
+     var ajaxRequest = new XMLHttpRequest();                
+     var queryString = "http://mineral.herokuapp.com/conditions";
+     
+     ajaxRequest.onreadystatechange = function () {    
+         if(ajaxRequest.readyState==4 && ajaxRequest.status==201) {
+             alert("Envoie réussi"); // A REMPLACER PAR UN MODAL
+             window.location.href = "index.html";
+         }
+     }
+           
+     ajaxRequest.open("POST", queryString, false);
+     ajaxRequest.setRequestHeader("Content-Type","application/json");
+     //chain = '{"name": "ESeppecher", "message": "Definitely love climbing!", "weather":"cloudy","location":{"latitude":48.9179434, "longitude":2.2934611}}';
+     alert(queryChain);
+     ajaxRequest.send(queryChain);
+   }
+</script>
+
+</body>
+</html>

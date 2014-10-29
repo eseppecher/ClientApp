@@ -1,0 +1,149 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+
+    // Wait for device API libraries to load
+    //
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+        // When device ready open,create database
+      
+         
+        var query = "SELECT * FROM CRAGS"; 
+        var db = window.openDatabase("BonowayDatas", "1.0", "Bonoway Database", 1000000);
+          
+        db.transaction(function (tx){ tx.executeSql( query, [], dispEntries, onError )});
+        
+    }
+
+
+    function dispEntries(tx, results){
+         var len = results.rows.length;
+         var chain= "";
+         superchain = "";
+         var element = document.getElementById('listing');
+         for (i = 0; i < len; i++){
+            chain= "display('" + results.rows.item(i).nom + "','" + results.rows.item(i).pays + "')";
+            superchain = '<tr> <td>'+ results.rows.item(i).nom  +
+                ' </td> <td>' + results.rows.item(i).linenb +    
+                ' </td> <td>' + results.rows.item(i).pays +    
+                ' </td> <td> <button type="button" class="btn btn-info" onClick="' + 
+                chain +
+                '"> Voir </button> ' +
+                ' </td> </tr>';           
+            element.innerHTML += superchain;
+         }
+    }
+
+
+    // Transaction error callback
+    function onError(tx, err) {
+        alert("Error processing SQL: "+err);
+    }
+
+   function display(x,y){
+        var requete= "nom='" + x + "';" + "pays='" + y + "';"  ;  
+        requete = escape(requete) ; 
+        window.location.href = "disCrag.html?" + requete ; 
+
+   }
+     
+    </script>
+
+
+
+    <!-- Le styles -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        color: #4E5053;   
+        
+      }
+      
+.navbar navbar-inverse navbar-fixed-top{
+ 
+}
+    </style>
+    <link href="../css/bootstrap-responsive.css" rel="stylesheet">
+
+
+</head> 
+<body> 
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="index.html"> Bonoway Mango</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="addLine.html"> <i class="icon-plus icon-white"></i> Ajouter une ligne </a></li>
+              <li><a href="addCrag.html"> <i class="icon-plus icon-white"></i> Ajouter un site </a></li>
+              <li><a href="listLines.html"> <i class="icon-th-list icon-white"> </i> Voies </a></li>
+              <li><a href="listCrags.html"> <i class="icon-th-list icon-white"> </i> Sites </a></li>
+              <li><a href="mapLines.html"> <i class="icon-map-marker icon-white"> </i> Carte des voies </a></li>
+              <li><a href="mapCrags.html"> <i class="icon-map-marker icon-white"> </i> Carte des sites </a></li>
+              <li><a href="settings.html"> <i class="icon-wrench icon-white"> </i> Réglages </a></li>              
+              <li><a href="dev/testarea.html"> - Developpement- </a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="container">
+
+      <h4>Table "crags" </h4>
+      
+    
+    <table class="table table-hover" id="listing"> 
+         <tr>  <td> Nom </td> <td> Nb voies </td> <td> Pays </td> <td> Consulter </td></tr>
+    </table>
+    
+    
+  </div>     <!-- /container -->
+
+
+
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+     
+    
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap-transition.js"></script>
+    <script src="../js/bootstrap-alert.js"></script>
+    <script src="../js/bootstrap-modal.js"></script>
+    <script src="../js/bootstrap-dropdown.js"></script>
+    <script src="../js/bootstrap-scrollspy.js"></script>
+    <script src="../js/bootstrap-tab.js"></script>
+    <script src="../js/bootstrap-tooltip.js"></script>
+    <script src="../js/bootstrap-popover.js"></script>
+    <script src="../js/bootstrap-button.js"></script>
+    <script src="../js/bootstrap-collapse.js"></script>
+    <script src="../js/bootstrap-carousel.js"></script>
+    <script src="../js/bootstrap-typeahead.js"></script>
+
+  </body>
+</html>

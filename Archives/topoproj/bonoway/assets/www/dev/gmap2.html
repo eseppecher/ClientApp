@@ -1,0 +1,191 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+
+
+    <!-- Le styles -->
+    <style>
+
+      @media (max-width: 979px) {
+      
+   #map-canvas {
+        margin: 0px;
+        float: left;
+        position: absolute;
+        width: 100%;
+        height: 90%;
+       }
+      
+      body {
+
+        color: #FD9801;
+      }
+      
+      
+      .navbar navbar-inverse navbar-fixed-top{ }
+      
+}
+      
+      @media (max-width: 767px) {
+      
+     body {
+        top: 50px;
+        left: 0px;
+        width: 100%;
+        height:100%;
+        color: #FD9801;
+      }
+      
+      #map-canvas {
+         position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height:100%;
+       }
+      
+      }      
+
+    </style>
+
+
+</head> 
+<body> 
+
+   
+      
+<div id="map-canvas"> Map is loading </div>
+    
+
+   
+          
+          <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&sensor=false"></script>
+    <script>
+function initialize() {
+
+  // Create an array of styles.
+  var styles = [
+    {
+      stylers: [
+        { hue: "#00ffe6" },
+        { saturation: -20 }
+      ]
+    },{
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [
+        { lightness: 100 },
+        { visibility: "simplified" }
+      ]
+    },{
+      featureType: "road",
+      elementType: "labels",
+      stylers: [
+        { visibility: "off" }
+      ]
+    }
+  ];
+  
+  // Create a new StyledMapType object, passing it the array of styles,
+  // as well as the name to be displayed on the map type control.
+  var styledMap = new google.maps.StyledMapType(styles,
+    {name: "Styled Map"});
+  
+  var fillArray = ['red', 'blue', 'yellow', 'green'];
+  
+  var mapOptions = {
+    zoom: 11,
+    center: new google.maps.LatLng(43.0983924,6.0531491),
+     mapTypeControlOptions: {
+      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+    }
+
+  };
+
+  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+
+   //Associate the styled map with the MapTypeId and set it to display.
+  map.mapTypes.set('map_style', styledMap);
+  map.setMapTypeId('map_style');
+ 
+ 
+/////////////////////////////////////////////////////////////////////////////////////
+
+  var polygontest;
+
+  var flightPlanCoordinates = [
+      new google.maps.LatLng(37.772323, -122.214897),
+      new google.maps.LatLng(21.291982, -157.821856),
+      new google.maps.LatLng(-18.142599, 178.431),
+      new google.maps.LatLng(-27.46758, 153.027892)
+  ];
+
+
+   var flightPath = new google.maps.Polyline({
+    path: flightPlanCoordinates,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+   });
+
+
+
+   // Construct the coordinates
+  var polygonCoords = [
+      new google.maps.LatLng(36.878865,30.474007),
+      new google.maps.LatLng(36.877046,30.458643),
+      new google.maps.LatLng(36.871896,30.463622),
+  ];
+
+
+
+  // Construct the polygon
+    polygontest = new google.maps.Polygon({
+    paths: polygonCoords,
+    strokeColor: '#F30153',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#F30153',
+    fillOpacity: 0.35
+  });
+
+    polygontest.setMap(map);
+//////////////////////////////////////////////////////////////////////////////////
+
+
+  var layer = new google.maps.visualization.DynamicMapsEngineLayer({
+    layerId: '06673056454046135537-08896501997766553811',
+    map: map,
+    suppressInfoWindows: true,
+    clickable: true
+  });
+
+  google.maps.event.addListener(layer, 'mouseover', function(event) {
+    var style = layer.getFeatureStyle(event.featureId);
+    style.fillColor = fillArray[event.featureId - 1];
+    style.fillOpacity = 80;
+  });
+
+  google.maps.event.addListener(layer, 'mouseout', function(event) {
+    var style = layer.getFeatureStyle(event.featureId).resetAll();
+  });
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+      
+     
+    <script type="text/javascript" charset="utf-8" src="../cordova-1.5.0.js"></script> 
+    
+    <script src="../../js/jquery.js"></script>
+
+
+  </body>
+</html>

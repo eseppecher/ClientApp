@@ -1,0 +1,94 @@
+<!DOCTYPE HTML> 
+<html> 
+<head> 
+<meta charset="utf-8">
+<title>Bonoway Android App 1.0 Mango</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content=""> 
+
+</head> 
+<body> 
+
+
+    <div class="container">
+
+      <h1>Ajouter une voie </h1>
+
+    <form role="form" name="newform">  
+   
+    
+    <b>Nom</b>
+    <div class="form-group">  <input type="text" name="nom" placeholder="Nom de la voie/bloc"> </div> <br>
+    
+    <b>Cotation</b>
+    <div class="col-lg-2"> 
+    <select class="input-mini" name="cote" placeholder="select" >
+           <option>2</option> <option>3a</option> <option>3b</option> <option>3c</option> <option>4a</option> <option>4b</option> <option>4c</option>
+           <option>5a</option> <option>5a+</option> <option>5b</option> <option>5b+</option> <option>5c</option> <option>5c+</option> 
+           <option>6a</option> <option>6a+</option> <option>6b</option> <option>6b+</option> <option>6c</option> <option>6c+</option>
+           <option>7a</option> <option>7a+</option> <option>7b</option> <option>7b+</option> <option>7c</option> <option>7c+</option>
+           <option>8a</option> <option>8a+</option> <option>8b</option> <option>8b+</option> <option>8c</option> <option>8c+</option>
+           <option>9a</option> <option>9a+</option> <option>9b</option> <option>9b+</option>
+    </select> </div>  <br>
+    
+    <b>Site</b>
+    <div class="form-group">  <input type="text" name="site" placeholder="Site"> </div> <br>
+    
+
+      
+      
+     <div id="submeat"> 
+      <button type='submit' id='submeatbt'class='btn btn-success' onClick='record()'> Ajouter! </button>
+    </div>
+   </form>
+ 
+ 
+    <div id="change"> 
+      <button id="changebt" class='btn btn-success' onClick="modify()"> Change </button>
+    </div>
+ 
+ 
+ 
+  </div>     <!-- /container -->
+
+
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+     
+    <script type="text/javascript" charset="utf-8">
+  
+     var jstar = {
+                "Nom":  "",
+                "Site": "",
+                "Cote": "",
+                "Geo": {
+                         "Latitude": 0.0,
+                         "Longitude": 0.0,
+                         "Altitude": 0.0,
+                         "Accuracy": 0.0
+                        }
+                 };
+
+
+     function record(newform) {
+
+           jstar.Nom =  document.newform.nom.value;
+           jstar.Site = document.newform.site.value;
+           jstar.Cote = document.newform.cote.value;
+           
+           alert(jstar.Nom);
+ 
+           alert(" La voie a bien été enregistrée!");     
+     }
+     function modify(){
+          var element = document.getElementById('submeat');
+          element.innerHTML = "<button type='submit' id='submeat'class='btn btn-success' onClick='record()'> <FONT COLOR='red' > Ajouter! </FONT> </button>";
+     }
+    </script>  
+
+  </body>
+</html>
