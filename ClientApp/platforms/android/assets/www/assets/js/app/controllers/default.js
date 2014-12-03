@@ -1,7 +1,8 @@
 
-
+//initiating db var to make it global
 var db;
 
+//filter function to show stars for a numeric rate. SHOULD BE MOUVED TO A FACTORY OR DIRECTIVES
 myApp.filter('makeRate', function ($filter) {
              return function (input) {
              if(input === null){ return ''; }
@@ -15,10 +16,8 @@ myApp.filter('makeRate', function ($filter) {
 });
 
 
-//Main controller
+//MAIN
 myApp.controller('mainController', function($scope, $location, $webSql) {
-
-	$scope.title	= 'Homepage';
                  
     $scope.isActive = function (viewLocation) {
             return viewLocation === $location.path();
@@ -60,7 +59,7 @@ myApp.controller('mainController', function($scope, $location, $webSql) {
     }
     var draft = "";
     for(var i=0; i< dataLines.length; i++){
-                 if(dataLines[i].description===""){draft="Pas de description";}else{draft=dataLines[i].description}
+        if(dataLines[i].description===""){draft="Pas de description.";}else{draft=dataLines[i].description}
         db.insert('lines', {"id": dataLines[i].id, "name": dataLines[i].name, "grade": dataLines[i].grade, "rate": dataLines[i].rate, "latitude": dataLines[i].latitude, "longitude": dataLines[i].longitude, "description": draft, "image": dataLines[i].image, "site": dataLines[i].site, "sector": dataLines[i].sector}).then(function(results) { console.log(results.insertId); });
     }
     for(var i=0; i< dataParkings.length; i++){
@@ -73,7 +72,7 @@ myApp.controller('mainController', function($scope, $location, $webSql) {
 
 
 
-
+//SITE LIST (current home page of the app)
 myApp.controller('SiteListCtrl', function($scope, $location, $webSql) {
 
     db.selectAll("sites").then(function(results) {
@@ -82,7 +81,6 @@ myApp.controller('SiteListCtrl', function($scope, $location, $webSql) {
                 $scope.sites.push(results.rows.item(i));
         }
     });
-                 
 	
 	$scope.detail = function(siteId) {
 		$location.path('/site/' + siteId);
@@ -90,7 +88,7 @@ myApp.controller('SiteListCtrl', function($scope, $location, $webSql) {
 });
 
 
-                 
+//DETAIL SITE (current home page of the app)
 myApp.controller('SiteDetailCtrl', function($scope, $routeParams, $location, $webSql) {
     
     $scope.map = { center: { latitude: 0, longitude: 0 }, zoom: 16 };
@@ -102,7 +100,6 @@ myApp.controller('SiteDetailCtrl', function($scope, $routeParams, $location, $we
 	sita = results.rows.item(0);
                  
 	/* Get child sector */
-                 
     $scope.sectors = [];
     db.select("sectors",{"site":{"value":id}}).then(function(results) {
       for(var i=0; i < results.rows.length; i++){
@@ -110,9 +107,6 @@ myApp.controller('SiteDetailCtrl', function($scope, $routeParams, $location, $we
         }
     
                  
-                 
-                 
-    
     /* Get child parkings */
     $scope.parkings = [];
     $scope.map = {};
@@ -140,7 +134,7 @@ myApp.controller('SiteDetailCtrl', function($scope, $routeParams, $location, $we
 });
 
 
-
+//SECTOR wether list or map display
 myApp.controller('SectorCtrl', function($scope, $routeParams, $location, $filter, $webSql) {
     $scope.map = { center: { latitude: 0, longitude: 0 }, zoom: 16 };
     id = parseInt($routeParams.siteId);
@@ -175,7 +169,6 @@ myApp.controller('SectorCtrl', function($scope, $routeParams, $location, $filter
     
     
     /* Get child line */
-
     db.select("lines",{"site":{"value":id}}).then(function(results) {
         for(var i=0; i < results.rows.length; i++){
             $scope.list.push(results.rows.item(i));
@@ -188,8 +181,6 @@ myApp.controller('SectorCtrl', function($scope, $routeParams, $location, $filter
     });
     });
     });
-                 
-                 
                  
     $scope.select = function(xid) {
         if(xid === 0){
@@ -227,13 +218,44 @@ myApp.controller('SectorCtrl', function($scope, $routeParams, $location, $filter
 });
 
 
+//DETAIL 2 carousel style
+myApp.controller('LineDetailCtrl-carousel', function($scope, $routeParams, $location, $webSql, $filter, $swipe, $ngSwipeLeft) {
+    
+    id = parseInt($routeParams.sectorId);
+                 alert(id);
+                 
+    $scope.lines = [];
+    db.select("lines", { "sector": { "value": id}}).then(function(results) {
+                for(var i=0; i < results.rows.length; i++){
+                    $scope.lines.push(results.rows.item(i));
+                }
+    });
+                 
+                 $scope.backSector = function(siteId,sectorId) {
+                 $location.path('/site/' + siteId + '/sector/' + sectorId);
+                 };
+                 
+                 $scope.previous = function(lineId) {
+                 var x = lineId-1;
+                 $location.path('/line/' + x);
+                 };
+                 
+                 
+                 $scope.next = function(lineId) {
+                 var x = lineId+1;
+                 $location.path('/line/' + x);
+                 };
+                 
+});
 
+
+
+
+//LINE DETAIL, wonder on change to carousel for a better swipe experience
 myApp.controller('LineDetailCtrl', function($scope, $routeParams, $location, $webSql, $filter, $swipe, $ngSwipeLeft) {
 	id = parseInt($routeParams.lineId);
     
                  
-                 
-	
     $scope.line = {};
     db.select("lines", { "id": { "value": id}}).then(function(results) { $scope.line = results.rows.item(0); });
 
@@ -254,7 +276,7 @@ myApp.controller('LineDetailCtrl', function($scope, $routeParams, $location, $we
 	                     
 });
     
-
+//SEARCH
 myApp.controller('searchCtrl', function($scope, $location) {
                  
     $scope.activeType = "all";
@@ -323,26 +345,13 @@ myApp.controller('searchCtrl', function($scope, $location) {
     }
    
                  
-
+    //to reach the item
     $scope.detailSite = function(siteId) { $location.path('/site/' + siteId); };
     $scope.detailLine = function(lineId) { $location.path('/line/' + lineId); };
 });
 
 
-
-myApp.controller('photoCtrl', function($scope, $rootScope) {
-                 
-        navigator.camera.getPicture(function(imagePath){
-                                             document.getElementById("photoImg").setAttribute("src", imagePath);
-                                             }, function(){
-                                             alert("Photo cancelled");
-                                             }, {
-                                             destinationType: navigator.camera.DestinationType.FILE_URI
-            });
-
-});
-
-
+// No controler required. In html content
 myApp.controller('aboutCtrl', function($scope, $rootScope) {
 	$scope.title	= 'A propos';
 	$scope.message	= 'Help page';
