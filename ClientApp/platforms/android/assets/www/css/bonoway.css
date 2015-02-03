@@ -1,5 +1,5 @@
 /*!
- * Bonoway CSS v1.1
+ * Bonoway CSS v1.2
  */
 
 
@@ -8,6 +8,10 @@
 
 body {
     color: #4E5053;
+}
+
+.img {
+    pointer-events: none;
 }
 
 a {
@@ -19,37 +23,29 @@ a:hover {
     outline: 0;
 }
 
-.actif{
-    color: #007aff;
-}
+.actif{ color: #007aff;}
+
+.justified{ float: none; }
+
+.route{ color: #F45F7A; }
+
+.badge-route{ background: #F45F7A; }/*! ROUTE COLOR : RED v1.0 */
+
+.boulder{ color: #F0F281; }
+
+.badge-boulder{ background: #F0F281; }/*! BOULDER COLOR : YELLOW v1.0 UGLY!!!!*/
+
+.bigwall{ color: #40AFE3; }
+
+.badge-bigwall{ background: #40AFE3; } /*! BIG WALL COLOR : BLUE v1.0 */
 
 
-.list-group-item > .badge{
-    
-}
-.justified{
-    float: none;
-}
-.route{
-    color: #F45F7A;
-}
-.badge-route{
-    
-    background: #F45F7A; /*! ROUTE COLOR : RED v1.0 */
-}
-.boulder{
-    color: #F0F281;
-}
-.badge-boulder{
-    
-    background: #F0F281; /*! BOULDER COLOR : YELLOW v1.0 UGLY!!!!*/
-}
-.bigwall{
-    color: #40AFE3;
-}
-.badge-bigwall{
-    background: #40AFE3; /*! BOULDER COLOR : YELLOW v1.0 */
-}
+
+.action{ color: #007aff; } /*! ELECTRIC BLUE */
+
+
+li {list-style-type: none;} /* to avoid indent of li : used in list ordering*/
+
 /* _________________________________________________________ */
 
 /* ANGULAR VIEW ENCAPSULATION : views are contained in a container*/
@@ -80,7 +76,6 @@ a:hover {
     height: 50px;
     margin: 0px;
     
-    
     background: #f8f8f8; /* (blue) background: #40afe3; */
     border-top: 1px solid #bfbfbf; /* (blue) box-shadow: 1px 1px 6px #555; */
 }
@@ -91,10 +86,12 @@ a:hover {
     display: inline-block;
     
     padding: 0px;
-    padding-top: 10px;
+    padding-top: 5px;
     font-size:x-large;
     text-align: center;
     color: #929292; /* (blue) background: #40afe3; */
+    font-size: 30px;
+    color: #007aff;
 }
 
 /* "here" is the style of the current location in the nav */
@@ -102,6 +99,10 @@ a:hover {
 .primarybar a:active, .here, .here i {
     background: #bfbfbf; /* (blue) background: #2985b0; */
     color: #007aff; /* (blue) color: #ffffff; */
+}
+
+.primarybar .action{
+    color: #007aff;
 }
 /* _________________________________________________________ */
 
@@ -123,6 +124,7 @@ a:hover {
     border-bottom: 1px solid #bfbfbf; /* (info) box-shadow: 1px 1px 6px #555; */
 }
 
+/* transparent version for over photo in line view*/
 .secondarybart{
     position: absolute;
     z-index: 5;
@@ -137,7 +139,20 @@ a:hover {
 
 }
 
-.secondarybar .back, .secondarybart .back{
+/* simple version with no bottom border*/
+.secondarybartt{
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    top: 0px;
+    right: 0px;
+    height: 60px;
+    margin: 0px;
+    
+    border-top: 1px solid #fff;
+}
+
+.secondarybar .back, .secondarybart .back, .secondarybartt .back{
     position: relative;
     width: 15%;
     float: left;
@@ -259,6 +274,16 @@ a:hover {
     margin: 0px;
 }
 
+/*  For styling the list in reordering modal    */
+.sorting{
+    border-width:1px;
+    border-style:solid;
+    border-color:#fff;
+}
+
+/* green background if location is registered */
+.valid { background-color: #dff0d8; }
+
 /* To avoid multiline column */
 .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
     padding-right: 0px;
@@ -268,8 +293,12 @@ a:hover {
     text-overflow: ellipsis; /* pour le reste du monde */
 }
 
+/* to avoid selecting in the reodering list SHOULD BE DEXPANDED TO OTHER LIST */
+ul .col-xs-1, ul .col-sm-1, ul .col-md-1, ul .col-lg-1, ul .col-xs-2, ul .col-sm-2, ul .col-md-2, ul .col-lg-2, ul .col-xs-3, ul .col-sm-3, ul .col-md-3, ul .col-lg-3, ul .col-xs-4, ul .col-sm-4, ul .col-md-4, ul .col-lg-4, ul .col-xs-5, ul .col-sm-5, ul .col-md-5, ul .col-lg-5, ul .col-xs-6, ul .col-sm-6, ul .col-md-6, ul .col-lg-6, ul .col-xs-7, ul .col-sm-7, ul .col-md-7, ul .col-lg-7, ul .col-xs-8, ul .col-sm-8, ul .col-md-8, ul .col-lg-8, ul .col-xs-9, ul .col-sm-9, ul .col-md-9, ul .col-lg-9, ul .col-xs-10, ul .col-sm-10, ul .col-md-10, ul .col-lg-10, ul .col-xs-11, ul .col-sm-11, ul .col-md-11, ul .col-lg-11, ul .col-xs-12, ul .col-sm-12, ul .col-md-12, ul .col-lg-12 {
+    pointer-events: none;
+}
 
-/* mais a quoi ça sert ??? */
+/* mais a quoi ça sert ??? pour les "tile" des sites ? */
 .col-xs-4, .col-xs-6, .col-xs-8, .col-xs-12{
     max-height: 100px;
 }
@@ -316,7 +345,7 @@ a:hover {
 .couverture{
     position: relative;
     width: 100%;
-    max-height: 120px;
+    max-height: 200px;
     overflow: hidden;
 }
 
@@ -336,7 +365,7 @@ a:hover {
 }
 
 .couverture .image{
-    margin-top: -50%;
+    margin-top: -30%;
     padding-top: 60px;
     opacity: 1;
     width: 100%;

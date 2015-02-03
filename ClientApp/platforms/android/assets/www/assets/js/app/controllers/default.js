@@ -16,12 +16,17 @@ myApp.filter('makeRate', function ($filter) {
 });
 
 
-//MAIN
+// MAIN !! db filled every time app load !!!! ///////////////////////////////////////////////////////////////////////////////
 myApp.controller('mainController', function($scope, $location, $webSql) {
                  
     $scope.isActive = function (viewLocation) {
             return viewLocation === $location.path();
     };
+                 
+    $scope.notActive = function (viewLocation) {
+            return viewLocation === $location.path();
+    };
+                 
                  
      //WEB SQL filling database
     // reading from html files with json architecture
@@ -57,6 +62,7 @@ myApp.controller('mainController', function($scope, $location, $webSql) {
     for(var i=0; i< dataSectors.length; i++){
         db.insert('sectors', {"id": dataSectors[i].id, "name": dataSectors[i].name, "latitude": dataSectors[i].latitude, "longitude": dataSectors[i].longitude, "approach": dataSectors[i].approach, "volume": dataSectors[i].volume, "site": dataSectors[i].site}).then(function(results) { console.log(results.insertId); });
     }
+    //WTF ??????
     var draft = "";
     for(var i=0; i< dataLines.length; i++){
         if(dataLines[i].description===""){draft="Pas de description.";}else{draft=dataLines[i].description}
@@ -71,8 +77,7 @@ myApp.controller('mainController', function($scope, $location, $webSql) {
 
 
 
-
-//SITE LIST (current home page of the app)
+// SITE LIST current home page of the app ///////////////////////////////////////////////////////////////////////////////
 myApp.controller('SiteListCtrl', function($scope, $location, $webSql) {
 
     db.selectAll("sites").then(function(results) {
@@ -88,7 +93,7 @@ myApp.controller('SiteListCtrl', function($scope, $location, $webSql) {
 });
 
 
-//DETAIL SITE (current home page of the app)
+// DETAIL SITE ////////////////////////////////////////////////////////////////////////////////////////
 myApp.controller('SiteDetailCtrl', function($scope, $routeParams, $location, $webSql) {
     
     $scope.map = { center: { latitude: 0, longitude: 0 }, zoom: 16 };
@@ -134,7 +139,7 @@ myApp.controller('SiteDetailCtrl', function($scope, $routeParams, $location, $we
 });
 
 
-//SECTOR wether list or map display
+// SECTOR both list or map display/////////////////////////////////////////////////////////////////////
 myApp.controller('SectorCtrl', function($scope, $routeParams, $location, $filter, $webSql) {
     $scope.map = { center: { latitude: 0, longitude: 0 }, zoom: 16 };
     id = parseInt($routeParams.siteId);
@@ -218,7 +223,7 @@ myApp.controller('SectorCtrl', function($scope, $routeParams, $location, $filter
 });
 
 
-//DETAIL 2 carousel style
+// !!!!!!!! DETAIL 2 carousel style !!!!!!!!!!!!!!/////////////////////////////////////////////////////////////////////////////////
 myApp.controller('LineDetailCtrl-carousel', function($scope, $routeParams, $location, $webSql, $filter, $swipe, $ngSwipeLeft) {
     
     id = parseInt($routeParams.sectorId);
@@ -250,8 +255,7 @@ myApp.controller('LineDetailCtrl-carousel', function($scope, $routeParams, $loca
 
 
 
-
-//LINE DETAIL, wonder on change to carousel for a better swipe experience
+// LINE DETAIL, wonder on change to carousel for a better swipe experience/////////////////////////////
 myApp.controller('LineDetailCtrl', function($scope, $routeParams, $location, $webSql, $filter, $swipe, $ngSwipeLeft) {
 	id = parseInt($routeParams.lineId);
     
@@ -276,7 +280,8 @@ myApp.controller('LineDetailCtrl', function($scope, $routeParams, $location, $we
 	                     
 });
     
-//SEARCH
+
+// SEARCH ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 myApp.controller('searchCtrl', function($scope, $location) {
                  
     $scope.activeType = "all";
